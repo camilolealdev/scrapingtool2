@@ -1,0 +1,6 @@
+{
+  "name": "Google Dorking Lab v5",
+  "description": "Advanced OSINT lead finder across multiple regions (CO, MX, AR, CL, PE, EC, ES, US, BR). Features automated dork generation, AI-powered lead extraction, and technical OSINT tools inspired by Daniel M. Russell's search patterns.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
