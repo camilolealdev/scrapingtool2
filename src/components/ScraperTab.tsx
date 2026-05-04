@@ -26,6 +26,7 @@ interface ScraperTabProps {
   allHistoryLogs: LogEntry[];
   exportAllLogs: () => void;
   generatePythonScript: () => void;
+  downloadPythonScript: () => void;
   autoStart: (query: string) => void;
   aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs";
   setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs") => void;
@@ -48,7 +49,7 @@ export function ScraperTab({
   scrapeResults, leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
   sortedAndFilteredLeads, setTab, exportLeadsCSV, scrapeLog,
   exportScrapeLog, allHistoryLogs, exportAllLogs,
-  generatePythonScript,
+  generatePythonScript, downloadPythonScript,
   autoStart,
   aiProvider, setAiProvider,
   orModel, setOrModel
@@ -118,9 +119,14 @@ export function ScraperTab({
             >
               Lote de URLs
             </button>
-            <button className="btn bg-bg1 border border-b0 text-t0 ml-2" onClick={generatePythonScript}>
-              <Terminal className="w-3.5 h-3.5" /> Generar Python
-            </button>
+            <div className="flex gap-2">
+              <button className="btn bg-bg1 border border-b0 text-t0" onClick={generatePythonScript}>
+                <Terminal className="w-3.5 h-3.5" /> Copiar Python
+              </button>
+              <button className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand" onClick={downloadPythonScript}>
+                <Download className="w-3.5 h-3.5" /> Descargar .py
+              </button>
+            </div>
           </div>
         </div>
 
