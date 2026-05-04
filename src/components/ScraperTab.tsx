@@ -32,6 +32,15 @@ interface ScraperTabProps {
   setOrModel: (v: string) => void;
 }
 
+const KEY_MAP = {
+  gemini: 'VITE_GEMINI_API_KEY',
+  openrouter: 'VITE_OPENROUTER_API_KEY',
+  nvidia: 'VITE_NVIDIA_API_KEY',
+  'google-cs': 'VITE_GOOGLE_CS_API_KEY',
+};
+
+const CX_KEY = 'VITE_GOOGLE_CS_CX';
+
 export function ScraperTab({
   scraping, scraperMode, setScraperMode, scrapeQuery, setScrapeQuery,
   runAIScrape, batchInput, setBatchInput, runBatchScrape,
@@ -42,6 +51,41 @@ export function ScraperTab({
   aiProvider, setAiProvider,
   orModel, setOrModel
 }: ScraperTabProps) {
+
+  const getSavedKey = (key: string) => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem(`osint_${key}`) || import.meta.env[key] || '';
+  };
+
+  const hasValidKey = () => {
+    const key = KEY_MAP[aiProvider];
+    const saved = getSavedKey(key);
+    if (!saved) return false;
+    if (aiProvider === 'google-cs') {
+      return !!getSavedKey(CX_KEY);
+    }
+    return true;
+  };
+
+  const handleKeyChange = (provider: string, value: string) => {
+    const key = KEY_MAP[provider as keyof typeof KEY_MAP];
+    if (value.trim()) {
+      localStorage.setItem(`osint_${key}`, value.trim());
+    } else {
+      localStorage.removeItem(`osint_${key}`);
+    }
+  };
+
+  const handleCxChange = (value: string) => {
+    if (value.trim()) {
+      localStorage.setItem(`osint_${CX_KEY}`, value.trim());
+    } else {
+      localStorage.removeItem(`osint_${CX_KEY}`);
+    }
+  };
+
+  const canStart = hasValidKey() && scrapeQuery.trim() && !scraping;
+
   return (
     <div>
       <div className="bg-bgc border border-b0 rounded-xl p-4 mb-4">
@@ -79,37 +123,70 @@ export function ScraperTab({
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-bold text-t2 uppercase tracking-widest">AI Provider</span>
             <div className="flex gap-2">
-              {[
-                { id: 'gemini', label: 'Gemini', key: 'VITE_GEMINI_API_KEY' },
-                { id: 'openrouter', label: 'OpenRouter', key: 'VITE_OPENROUTER_API_KEY' },
-                { id: 'nvidia', label: 'NVIDIA NIM', key: 'VITE_NVIDIA_API_KEY' },
-                { id: 'google-cs', label: 'Google CS', key: 'VITE_GOOGLE_CS_API_KEY' },
-              ].map(p => {
-                const hasKey = typeof import.meta.env[p.key] === 'string' && import.meta.env[p.key];
+              {Object.entries(KEY_MAP).map(([id, key]) => {
+                const saved = getSavedKey(key);
+                const isActive = aiProvider === id;
                 return (
                   <button
-                    key={p.id}
-                    className={`btn text-[10px] font-bold px-3 py-1 border transition-all ${aiProvider === p.id ? "bg-bg3 border-blue-brand text-blue-brand" : "bg-bg1 border-b0 text-t2 hover:text-t1"}`}
-                    onClick={() => setAiProvider(p.id as any)}
+                    key={id}
+                    className={`btn text-[10px] font-bold px-3 py-1 border transition-all ${isActive ? "bg-bg3 border-blue-brand text-blue-brand" : "bg-bg1 border-b0 text-t2 hover:text-t1"}`}
+                    onClick={() => setAiProvider(id as any)}
                   >
-                    <span className={`w-2 h-2 rounded-full inline-block mr-1 ${hasKey ? "bg-green-brand" : "bg-red-brand/50"}`} />
-                    {p.label}
+                    <span className={`w-2 h-2 rounded-full inline-block mr-1 ${saved ? "bg-green-brand" : "bg-red-brand/50"}`} />
+                    {id === 'google-cs' ? 'Google CS' : id === 'openrouter' ? 'OpenRouter' : id === 'nvidia' ? 'NVIDIA' : 'Gemini'}
                   </button>
                 );
               })}
             </div>
           </div>
-          {aiProvider === 'nvidia' && (
+
+          {/* Key inputs */}
+          {(aiProvider === 'gemini' || aiProvider === 'openrouter' || aiProvider === 'nvidia') && (
             <div className="flex gap-2 mt-2">
-              <input className="inp flex-1 text-[10px]" placeholder="nvapi-..." value={import.meta.env.VITE_NVIDIA_API_KEY || ''} readOnly />
+              <input
+                className="inp flex-1 text-[10px]"
+                placeholder={`Pega tu ${aiProvider === 'gemini' ? 'Gemini' : aiProvider === 'openrouter' ? 'OpenRouter' : 'NVIDIA'} API key...`}
+                defaultValue={getSavedKey(KEY_MAP[aiProvider])}
+                onChange={e => handleKeyChange(aiProvider, e.target.value)}
+              />
+              {hasValidKey() && (
+                <button
+                  className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px]"
+                  onClick={() => { if (scrapeQuery.trim()) runAIScrape(scrapeQuery); }}
+                  disabled={!scrapeQuery.trim() || scraping}
+                >
+                  ▶ Iniciar
+                </button>
+              )}
             </div>
           )}
+
           {aiProvider === 'google-cs' && (
             <div className="flex gap-2 mt-2">
-              <input className="inp flex-1 text-[10px]" placeholder="API Key" value={import.meta.env.VITE_GOOGLE_CS_API_KEY || ''} readOnly />
-              <input className="inp flex-1 text-[10px]" placeholder="CX ID" value={import.meta.env.VITE_GOOGLE_CS_CX || ''} readOnly />
+              <input
+                className="inp flex-1 text-[10px]"
+                placeholder="Google CS API Key..."
+                defaultValue={getSavedKey(KEY_MAP['google-cs'])}
+                onChange={e => handleKeyChange('google-cs', e.target.value)}
+              />
+              <input
+                className="inp flex-1 text-[10px]"
+                placeholder="CX ID..."
+                defaultValue={getSavedKey(CX_KEY)}
+                onChange={e => handleCxChange(e.target.value)}
+              />
+              {hasValidKey() && (
+                <button
+                  className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px]"
+                  onClick={() => { if (scrapeQuery.trim()) runAIScrape(scrapeQuery); }}
+                  disabled={!scrapeQuery.trim() || scraping}
+                >
+                  ▶ Iniciar
+                </button>
+              )}
             </div>
           )}
+
           {aiProvider === 'openrouter' && (
             <div className="flex gap-2 mt-2">
               <select
@@ -125,7 +202,7 @@ export function ScraperTab({
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 mt-4">
           {scraperMode === "search" ? (
             <div className="flex gap-2">
               <input
@@ -133,13 +210,13 @@ export function ScraperTab({
                 placeholder="Pega un dork o describe tu búsqueda..."
                 value={scrapeQuery}
                 onChange={e => setScrapeQuery(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && runAIScrape(scrapeQuery)}
+                onKeyDown={e => e.key === "Enter" && hasValidKey() && runAIScrape(scrapeQuery)}
               />
               <div className="flex gap-1">
                 <button
                   className={`btn bg-blue-brand text-white px-6 h-full ${scraping ? "animate-pulse opacity-50" : ""}`}
                   onClick={() => runAIScrape(scrapeQuery)}
-                  disabled={scraping}
+                  disabled={scraping || !hasValidKey()}
                 >
                   Extraer
                 </button>
@@ -163,7 +240,7 @@ export function ScraperTab({
                 onChange={e => setBatchInput(e.target.value)}
               />
               <div className="flex justify-between items-center bg-bg1/50 p-2 rounded-lg border border-b0">
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   <button
                     className={`btn bg-blue-brand text-white px-8 ${scraping ? "animate-pulse" : ""}`}
                     onClick={runBatchScrape}
@@ -195,32 +272,6 @@ export function ScraperTab({
               </div>
             )}
           </div>
-
-          {scrapeResults.length > 0 && (
-            <div className="flex gap-2 mb-3">
-              <div className="relative flex-1">
-                <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-t2" />
-                <input
-                  className="inp !py-1 !pl-8 !text-[10px] w-full"
-                  placeholder="Buscar en leads (nombre, dirección, email)..."
-                  value={leadsSearch}
-                  onChange={e => setLeadsSearch(e.target.value)}
-                />
-              </div>
-              <div className="flex border border-b0 rounded bg-bgc overflow-hidden text-[9px] uppercase font-bold text-t2">
-                {['name', 'phone', 'email', 'address'].map(k => (
-                  <button
-                    key={k}
-                    className={`px-2 py-1 border-r border-b0 last:border-r-0 hover:bg-bg2 transition-colors ${sortConfig.key === k ? "text-cyan-brand bg-bg3" : ""}`}
-                    onClick={() => setSortConfig({ key: k, direction: sortConfig.key === k && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
-                  >
-                    {k === 'name' ? 'Nombre' : k === 'phone' ? 'Tel' : k === 'email' ? 'Email' : 'Dir'}
-                    {sortConfig.key === k && (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {scrapeResults.length === 0 && !scraping && (
             <div className="h-full flex items-center justify-center border border-dashed border-b0 rounded-xl text-t2 text-xs italic text-center px-8">

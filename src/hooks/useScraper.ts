@@ -25,12 +25,34 @@ export function useScraper(
   const [geocoding, setGeocoding] = useState(false);
   const [mapParams, setMapParams] = useState<MapParams>({ center: [4.5709, -74.2973], zoom: 6 });
   const [locSearch, setLocSearch] = useState("");
-  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs">("gemini");
+  // Auto-detect available providers from localStorage or env
+  const getKey = (key: string) => localStorage.getItem(`osint_${key}`) || import.meta.env[key] || '';
+  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs">(() => {
+    if (getKey("VITE_GEMINI_API_KEY")) return "gemini";
+    if (getKey("VITE_OPENROUTER_API_KEY")) return "openrouter";
+    if (getKey("VITE_NVIDIA_API_KEY")) return "nvidia";
+    if (getKey("VITE_GOOGLE_CS_API_KEY")) return "google-cs";
+    return "gemini";
+  });
   const [orModel, setOrModel] = useState("anthropic/claude-3.5-sonnet");
 
   const addLog = useCallback((msg: string) => {
     setScrapeLog(prev => [...prev, { time: new Date().toLocaleTimeString(), msg }]);
   }, []);
+
+  // Auto-start scrape when provider is ready and query is valid
+  const autoStart = useCallback((query: string) => {
+    if (!query.trim() || scraping) return;
+    const hasKey =
+      (aiProvider === "gemini" && getKey("VITE_GEMINI_API_KEY")) ||
+      (aiProvider === "openrouter" && getKey("VITE_OPENROUTER_API_KEY")) ||
+      (aiProvider === "nvidia" && getKey("VITE_NVIDIA_API_KEY")) ||
+      (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX"));
+    if (hasKey) {
+      addLog(`🚀 Auto-iniciando con ${aiProvider.toUpperCase()}...`);
+      runAIScrape(query);
+    }
+  }, [aiProvider, scraping, runAIScrape, addLog]);
 
   const checkInputs = useCallback(() => {
     if (!niche.trim() || !city.trim() || !zone.trim()) {
@@ -349,15 +371,16 @@ if __name__ == "__main__":
   }, [scrapeResults, leadsSearch, sortConfig]);
 
     return {
-    scrapeQuery, setScrapeQuery, scrapeResults, setScrapeResults,
-    scraping, setScraping, scrapeLog, setScrapeLog,
-    allHistoryLogs, setAllHistoryLogs,
-    scraperMode, setScraperMode, batchInput, setBatchInput,
-    leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
-    geocoding, mapParams, setMapParams, locSearch, setLocSearch,
-    aiProvider, setAiProvider, orModel, setOrModel,
-    checkInputs, addLog, searchLocation, runAIScrape, runBatchScrape,
-    exportLeadsCSV, generatePythonScript, exportScrapeLog, exportAllLogs,
-    sortedAndFilteredLeads
-  };
+      scrapeQuery, setScrapeQuery, scrapeResults, setScrapeResults,
+      scraping, setScraping, scrapeLog, setScrapeLog,
+      allHistoryLogs, setAllHistoryLogs,
+      scraperMode, setScraperMode, batchInput, setBatchInput,
+      leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
+      geocoding, mapParams, setMapParams, locSearch, setLocSearch,
+      aiProvider, setAiProvider, orModel, setOrModel,
+      keysLoaded, setKeysLoaded, getKey,
+      checkInputs, addLog, searchLocation, runAIScrape, runBatchScrape, autoStart,
+      exportLeadsCSV, generatePythonScript, exportScrapeLog, exportAllLogs,
+      sortedAndFilteredLeads
+    };
 }
