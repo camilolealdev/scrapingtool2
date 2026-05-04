@@ -5,7 +5,7 @@ import { useRegion } from './hooks/useRegion';
 import { useScraper } from './hooks/useScraper';
 import { useHistory } from './hooks/useHistory';
 import { useFavorites } from './hooks/useFavorites';
-import { REGIONS, OPERATORS } from './utils/dorkBuilder';
+import { REGIONS, OPERATORS, fillTemplate } from './utils/dorkBuilder';
 import type { SortConfig, MapParams, ScrapeResult, LogEntry, QueryResult, CategoryTemplate, Template, BulkDork } from './types';
 
 import { Header } from './components/Header';
