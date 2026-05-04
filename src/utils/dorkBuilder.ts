@@ -174,7 +174,7 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
 
 export function fillTemplate(q: string, niche: string, city: string, zone: string, year: number, showErrors: boolean): string {
   const n = niche || (showErrors ? "!!!" : "dentista");
-  const c = city || (showErrors ? "!!!" : "medellin");
+  const c = city || (showErrors ? "!!!" : "medellín");
   return q
     .replace(/\{NICHE\}/g, n)
     .replace(/\{CITY\}/g, c)
