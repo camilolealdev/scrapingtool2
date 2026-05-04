@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import type { ScrapeResult, LogEntry, SortConfig, MapParams, QueryResult } from '../types';
 import { fillTemplate } from '../utils/dorkBuilder';
@@ -8,7 +8,7 @@ import { googleCustomSearch } from '../utils/googleCS';
 
 export function useScraper(
   niche: string, city: string, zone: string, year: number,
-  region: string, R: any, TEMPLATES: TEMPLATES_TYPE,
+  region: string, R: any, TEMPLATES: any,
   showToast: (msg: string) => void,
   setShowErrors: (v: boolean) => void
 ) {
@@ -25,8 +25,9 @@ export function useScraper(
   const [geocoding, setGeocoding] = useState(false);
   const [mapParams, setMapParams] = useState<MapParams>({ center: [4.5709, -74.2973], zoom: 6 });
   const [locSearch, setLocSearch] = useState("");
-  // Auto-detect available providers from localStorage or env
+
   const getKey = (key: string) => localStorage.getItem(`osint_${key}`) || import.meta.env[key] || '';
+
   const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs">(() => {
     if (getKey("VITE_GEMINI_API_KEY")) return "gemini";
     if (getKey("VITE_OPENROUTER_API_KEY")) return "openrouter";
@@ -35,24 +36,11 @@ export function useScraper(
     return "gemini";
   });
   const [orModel, setOrModel] = useState("anthropic/claude-3.5-sonnet");
+  const [keysLoaded, setKeysLoaded] = useState(true);
 
   const addLog = useCallback((msg: string) => {
     setScrapeLog(prev => [...prev, { time: new Date().toLocaleTimeString(), msg }]);
   }, []);
-
-  // Auto-start scrape when provider is ready and query is valid
-  const autoStart = useCallback((query: string) => {
-    if (!query.trim() || scraping) return;
-    const hasKey =
-      (aiProvider === "gemini" && getKey("VITE_GEMINI_API_KEY")) ||
-      (aiProvider === "openrouter" && getKey("VITE_OPENROUTER_API_KEY")) ||
-      (aiProvider === "nvidia" && getKey("VITE_NVIDIA_API_KEY")) ||
-      (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX"));
-    if (hasKey) {
-      addLog(`🚀 Auto-iniciando con ${aiProvider.toUpperCase()}...`);
-      runAIScrape(query);
-    }
-  }, [aiProvider, scraping, runAIScrape, addLog]);
 
   const checkInputs = useCallback(() => {
     if (!niche.trim() || !city.trim() || !zone.trim()) {
@@ -73,7 +61,6 @@ export function useScraper(
       if (data && data[0]) {
         const { display_name, lat, lon } = data[0];
         const parts = display_name.split(", ");
-        // Note: setCity/setZone would need to be passed or handled differently
         setMapParams({ center: [parseFloat(lat), parseFloat(lon)], zoom: 12 });
         showToast(`📍 Ubicación: ${parts[0]}`);
       } else {
@@ -86,7 +73,7 @@ export function useScraper(
     }
   };
 
-  const runAIScrape = async (query: string, mode: "standard" | "instagram" | "emails" | "phones" = "standard") => {
+  const runAIScrape = useCallback(async (query: string, mode: "standard" | "instagram" | "emails" | "phones" = "standard") => {
     if (!checkInputs()) return;
     if (!query.trim() || scraping) return;
 
@@ -110,7 +97,8 @@ export function useScraper(
     try {
       if (aiProvider === "gemini") {
         addLog("📡 Consultando a Gemini con herramientas de búsqueda...");
-        const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY! });
+        const apiKey = getKey("VITE_GEMINI_API_KEY");
+        const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
           model: "gemini-2.0-flash",
           contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -141,33 +129,38 @@ export function useScraper(
         });
         const text = response.text;
         if (text) {
-          let leads = JSON.parse(text);
-          if (Array.isArray(leads)) {
-            setScrapeResults(prev => [...prev, ...leads]);
-            addLog(`✅ ¡Éxito! Se añadieron ${leads.length} leads.`);
+          const parsed = JSON.parse(text);
+          if (Array.isArray(parsed)) {
+            setScrapeResults(prev => [...prev, ...parsed]);
+            addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
           }
         }
       } else if (aiProvider === "openrouter") {
         addLog(`📡 Consultando OpenRouter (${orModel})...`);
-        const leads = await callOpenRouter(import.meta.env.VITE_OPENROUTER_API_KEY!, orModel, prompt, instructions);
-        if (Array.isArray(leads)) {
-          setScrapeResults(prev => [...prev, ...leads]);
-          addLog(`✅ ¡Éxito! Se añadieron ${leads.length} leads.`);
+        const apiKey = getKey("VITE_OPENROUTER_API_KEY");
+        const parsed = await callOpenRouter(apiKey, orModel, prompt, instructions);
+        if (Array.isArray(parsed)) {
+          setScrapeResults(prev => [...prev, ...parsed]);
+          addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
         }
       } else if (aiProvider === "nvidia") {
         addLog("📡 Consultando a NVIDIA NIM...");
-        const leads = await callNVIDIANIM(import.meta.env.VITE_NVIDIA_API_KEY!, "nvidia/nemotron-4-340b-instruct", `${instructions}\n\n${prompt}`);
-        if (Array.isArray(leads)) {
-          setScrapeResults(prev => [...prev, ...leads]);
-          addLog(`✅ ¡Éxito! Se añadieron ${leads.length} leads.`);
+        const apiKey = getKey("VITE_NVIDIA_API_KEY");
+        const parsed = await callNVIDIANIM(apiKey, "nvidia/nemotron-4-340b-instruct", `${instructions}\n\n${prompt}`);
+        if (Array.isArray(parsed)) {
+          setScrapeResults(prev => [...prev, ...parsed]);
+          addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
         }
       } else if (aiProvider === "google-cs") {
         addLog("🔍 Google Custom Search...");
-        const results = await googleCustomSearch(import.meta.env.VITE_GOOGLE_CS_API_KEY!, import.meta.env.VITE_GOOGLE_CS_CX!, query);
+        const csApiKey = getKey("VITE_GOOGLE_CS_API_KEY");
+        const csCx = getKey("VITE_GOOGLE_CS_CX");
+        const results = await googleCustomSearch(csApiKey, csCx, query);
         addLog(`✅ ${results.length} URLs encontradas, extrayendo leads...`);
         for (const item of results) {
           try {
-            const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY! });
+            const geminiKey = getKey("VITE_GEMINI_API_KEY");
+            const ai = new GoogleGenAI({ apiKey: geminiKey });
             const response = await ai.models.generateContent({
               model: "gemini-2.0-flash",
               contents: [{ role: "user", parts: [{ text: `Analiza esta página: ${item.link}. Extrae leads de negocios. Devuelve array JSON.` }] }],
@@ -195,13 +188,13 @@ export function useScraper(
                 },
               },
             });
-            const text = response.text;
-            if (text) {
-              const leads = JSON.parse(text);
-              if (Array.isArray(leads)) {
-                setScrapeResults(prev => [...prev, ...leads]);
+              const text = response.text;
+              if (text) {
+                const parsed = JSON.parse(text);
+                if (Array.isArray(parsed)) {
+                  setScrapeResults(prev => [...prev, ...parsed]);
+                }
               }
-            }
           } catch (e: any) {
             addLog(`❌ Error en ${item.link}: ${e.message}`);
           }
@@ -213,7 +206,21 @@ export function useScraper(
     } finally {
       setScraping(false);
     }
-  };
+  }, [aiProvider, scraping, orModel, checkInputs, addLog]);
+
+  // Auto-start scrape when provider is ready and query is valid
+  const autoStart = useCallback((query: string) => {
+    if (!query.trim() || scraping) return;
+    const hasKey =
+      (aiProvider === "gemini" && getKey("VITE_GEMINI_API_KEY")) ||
+      (aiProvider === "openrouter" && getKey("VITE_OPENROUTER_API_KEY")) ||
+      (aiProvider === "nvidia" && getKey("VITE_NVIDIA_API_KEY")) ||
+      (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX"));
+    if (hasKey) {
+      addLog(`🚀 Auto-iniciando con ${aiProvider.toUpperCase()}...`);
+      runAIScrape(query);
+    }
+  }, [aiProvider, scraping, runAIScrape, addLog]);
 
   const runBatchScrape = async () => {
     if (!batchInput.trim() || scraping) return;
@@ -287,12 +294,12 @@ def extract_leads(target_url):
     try:
         resp = requests.get(target_url, headers=HEADERS, timeout=10)
         text = resp.text
-        
+
         # Regex extraction
-        emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}', text)
-        phones = re.findall(r'\\+?\\d{1,3}[\\s.-]?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}', text)
-        socials = re.findall(r'instagram\\.com/[a-zA-Z0-9._-]+|facebook\\.com/[a-zA-Z0-9._-]+', text)
-        
+        emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
+        phones = re.findall(r'\\+?\d{1,3}[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}', text)
+        socials = re.findall(r'instagram\.com/[a-zA-Z0-9._-]+|facebook\.com/[a-zA-Z0-9._-]+', text)
+
         return {
             "source": target_url,
             "emails": list(set(emails)),
@@ -311,7 +318,7 @@ def main():
             if lead:
                 all_leads.append(lead)
             time.sleep(2)
-            
+
     with open(f"leads_{NICHE}_{CITY}.json", "w") as f:
         json.dump(all_leads, f, indent=4)
     print(f"[*] Done! Saved {len(all_leads)} leads to JSON.")
@@ -370,17 +377,17 @@ if __name__ == "__main__":
     return result;
   }, [scrapeResults, leadsSearch, sortConfig]);
 
-    return {
-      scrapeQuery, setScrapeQuery, scrapeResults, setScrapeResults,
-      scraping, setScraping, scrapeLog, setScrapeLog,
-      allHistoryLogs, setAllHistoryLogs,
-      scraperMode, setScraperMode, batchInput, setBatchInput,
-      leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
-      geocoding, mapParams, setMapParams, locSearch, setLocSearch,
-      aiProvider, setAiProvider, orModel, setOrModel,
-      keysLoaded, setKeysLoaded, getKey,
-      checkInputs, addLog, searchLocation, runAIScrape, runBatchScrape, autoStart,
-      exportLeadsCSV, generatePythonScript, exportScrapeLog, exportAllLogs,
-      sortedAndFilteredLeads
-    };
+  return {
+    scrapeQuery, setScrapeQuery, scrapeResults, setScrapeResults,
+    scraping, setScraping, scrapeLog, setScrapeLog,
+    allHistoryLogs, setAllHistoryLogs,
+    scraperMode, setScraperMode, batchInput, setBatchInput,
+    leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
+    geocoding, mapParams, setMapParams, locSearch, setLocSearch,
+    aiProvider, setAiProvider, orModel, setOrModel,
+    keysLoaded, setKeysLoaded, getKey,
+    checkInputs, addLog, searchLocation, runAIScrape, runBatchScrape, autoStart,
+    exportLeadsCSV, generatePythonScript, exportScrapeLog, exportAllLogs,
+    sortedAndFilteredLeads
+  };
 }
