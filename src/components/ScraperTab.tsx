@@ -1,0 +1,267 @@
+import React from 'react';
+import { Bot, Terminal, Instagram, Mail, Zap, MapPin, Download, Search, FileText, Database } from "lucide-react";
+import { ScrapeResult, LogEntry } from '../types';
+import { LeadCard } from './LeadCard';
+
+interface ScraperTabProps {
+  scraping: boolean;
+  scraperMode: "search" | "batch";
+  setScraperMode: (v: "search" | "batch") => void;
+  scrapeQuery: string;
+  setScrapeQuery: (v: string) => void;
+  runAIScrape: (query: string, mode?: "standard" | "instagram" | "emails" | "phones") => void;
+  batchInput: string;
+  setBatchInput: (v: string) => void;
+  runBatchScrape: () => void;
+  scrapeResults: ScrapeResult[];
+  leadsSearch: string;
+  setLeadsSearch: (v: string) => void;
+  sortConfig: { key: string; direction: 'asc' | 'desc' };
+  setSortConfig: (v: { key: string; direction: 'asc' | 'desc' }) => void;
+  sortedAndFilteredLeads: ScrapeResult[];
+  setTab: (v: string) => void;
+  exportLeadsCSV: () => void;
+  scrapeLog: LogEntry[];
+  exportScrapeLog: () => void;
+  allHistoryLogs: LogEntry[];
+  exportAllLogs: () => void;
+  generatePythonScript: () => void;
+  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs";
+  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs") => void;
+  orModel: string;
+  setOrModel: (v: string) => void;
+}
+
+export function ScraperTab({
+  scraping, scraperMode, setScraperMode, scrapeQuery, setScrapeQuery,
+  runAIScrape, batchInput, setBatchInput, runBatchScrape,
+  scrapeResults, leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
+  sortedAndFilteredLeads, setTab, exportLeadsCSV, scrapeLog,
+  exportScrapeLog, allHistoryLogs, exportAllLogs,
+  generatePythonScript,
+  aiProvider, setAiProvider,
+  orModel, setOrModel
+}: ScraperTabProps) {
+  return (
+    <div>
+      <div className="bg-bgc border border-b0 rounded-xl p-4 mb-4">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-brand/10 flex items-center justify-center text-blue-brand">
+              <Bot className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold">🤖 AI Extractor</h2>
+              <p className="text-[10px] text-t2">Navega y extrae leads estructurados en segundos.</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              className={`btn text-[10px] font-bold px-3 py-1 border transition-all ${scraperMode === "search" ? "bg-bg3 border-blue-brand text-blue-brand" : "bg-bg1 border-b0 text-t2 hover:text-t1"}`}
+              onClick={() => setScraperMode("search")}
+            >
+              Búsqueda IA
+            </button>
+            <button
+              className={`btn text-[10px] font-bold px-3 py-1 border transition-all ${scraperMode === "batch" ? "bg-bg3 border-blue-brand text-blue-brand" : "bg-bg1 border-b0 text-t2 hover:text-t1"}`}
+              onClick={() => setScraperMode("batch")}
+            >
+              Lote de URLs
+            </button>
+            <button className="btn bg-bg1 border border-b0 text-t0 ml-2" onClick={generatePythonScript}>
+              <Terminal className="w-3.5 h-3.5" /> Generar Python
+            </button>
+          </div>
+        </div>
+
+        {/* Provider selector */}
+        <div className="bg-bg1/50 p-3 rounded-lg border border-b0">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold text-t2 uppercase tracking-widest">AI Provider</span>
+            <div className="flex gap-2">
+              {[
+                { id: 'gemini', label: 'Gemini', key: 'VITE_GEMINI_API_KEY' },
+                { id: 'openrouter', label: 'OpenRouter', key: 'VITE_OPENROUTER_API_KEY' },
+                { id: 'nvidia', label: 'NVIDIA NIM', key: 'VITE_NVIDIA_API_KEY' },
+                { id: 'google-cs', label: 'Google CS', key: 'VITE_GOOGLE_CS_API_KEY' },
+              ].map(p => {
+                const hasKey = typeof import.meta.env[p.key] === 'string' && import.meta.env[p.key];
+                return (
+                  <button
+                    key={p.id}
+                    className={`btn text-[10px] font-bold px-3 py-1 border transition-all ${aiProvider === p.id ? "bg-bg3 border-blue-brand text-blue-brand" : "bg-bg1 border-b0 text-t2 hover:text-t1"}`}
+                    onClick={() => setAiProvider(p.id as any)}
+                  >
+                    <span className={`w-2 h-2 rounded-full inline-block mr-1 ${hasKey ? "bg-green-brand" : "bg-red-brand/50"}`} />
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {aiProvider === 'nvidia' && (
+            <div className="flex gap-2 mt-2">
+              <input className="inp flex-1 text-[10px]" placeholder="nvapi-..." value={import.meta.env.VITE_NVIDIA_API_KEY || ''} readOnly />
+            </div>
+          )}
+          {aiProvider === 'google-cs' && (
+            <div className="flex gap-2 mt-2">
+              <input className="inp flex-1 text-[10px]" placeholder="API Key" value={import.meta.env.VITE_GOOGLE_CS_API_KEY || ''} readOnly />
+              <input className="inp flex-1 text-[10px]" placeholder="CX ID" value={import.meta.env.VITE_GOOGLE_CS_CX || ''} readOnly />
+            </div>
+          )}
+          {aiProvider === 'openrouter' && (
+            <div className="flex gap-2 mt-2">
+              <select
+                className="inp text-[10px] flex-1"
+                value={orModel}
+                onChange={e => setOrModel(e.target.value)}
+              >
+                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                <option value="openai/gpt-4o">GPT-4o</option>
+                <option value="meta-llama/llama-3.1-405b">Llama 3.1 405B</option>
+              </select>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          {scraperMode === "search" ? (
+            <div className="flex gap-2">
+              <input
+                className="inp flex-1"
+                placeholder="Pega un dork o describe tu búsqueda..."
+                value={scrapeQuery}
+                onChange={e => setScrapeQuery(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && runAIScrape(scrapeQuery)}
+              />
+              <div className="flex gap-1">
+                <button
+                  className={`btn bg-blue-brand text-white px-6 h-full ${scraping ? "animate-pulse opacity-50" : ""}`}
+                  onClick={() => runAIScrape(scrapeQuery)}
+                  disabled={scraping}
+                >
+                  Extraer
+                </button>
+                <button className="btn bg-pink-brand/20 border border-pink-brand/30 text-pink-brand px-3" onClick={() => runAIScrape(scrapeQuery, "instagram")} title="Extraer de Instagram">
+                  <Instagram className="w-4 h-4" />
+                </button>
+                <button className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand px-3" onClick={() => runAIScrape(scrapeQuery, "emails")} title="Extraer Emails">
+                  <Mail className="w-4 h-4" />
+                </button>
+                <button className="btn bg-orange-brand/20 border border-orange-brand/30 text-orange-brand px-3" onClick={() => runAIScrape(scrapeQuery, "phones")} title="Extraer Teléfonos">
+                  <Zap className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <textarea
+                className="inp w-full min-h-[100px] font-mono text-xs"
+                placeholder="Ingresa una URL o búsqueda por línea..."
+                value={batchInput}
+                onChange={e => setBatchInput(e.target.value)}
+              />
+              <div className="flex justify-between items-center bg-bg1/50 p-2 rounded-lg border border-b0">
+                <div className="flex gap-2">
+                  <button
+                    className={`btn bg-blue-brand text-white px-8 ${scraping ? "animate-pulse" : ""}`}
+                    onClick={runBatchScrape}
+                    disabled={scraping}
+                  >
+                    Procesar Lote
+                  </button>
+                  <button className="btn bg-bg1 border border-b0 text-t2" onClick={() => setBatchInput("")}>Limpiar</button>
+                </div>
+                <span className="text-[10px] text-t2 italic font-mono">{batchInput.split("\n").filter(l => l.trim()).length} objetivos</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-4 h-[500px]">
+        <div className="lg:col-span-2 space-y-3 overflow-y-auto pr-2 scrollbar-thin flex flex-col">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[10px] font-bold text-t2 uppercase tracking-widest">{sortedAndFilteredLeads.length} Leads Encontrados</span>
+            {scrapeResults.length > 0 && (
+              <div className="flex gap-4">
+                <button className="flex items-center gap-1.5 text-cyan-brand text-[10px] font-bold hover:underline" onClick={() => setTab("map")}>
+                  <MapPin className="w-3 h-3" /> Ver en Mapa
+                </button>
+                <button className="flex items-center gap-1.5 text-blue-brand text-[10px] font-bold hover:underline" onClick={exportLeadsCSV}>
+                  <Download className="w-3 h-3" /> Exportar CSV
+                </button>
+              </div>
+            )}
+          </div>
+
+          {scrapeResults.length > 0 && (
+            <div className="flex gap-2 mb-3">
+              <div className="relative flex-1">
+                <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-t2" />
+                <input
+                  className="inp !py-1 !pl-8 !text-[10px] w-full"
+                  placeholder="Buscar en leads (nombre, dirección, email)..."
+                  value={leadsSearch}
+                  onChange={e => setLeadsSearch(e.target.value)}
+                />
+              </div>
+              <div className="flex border border-b0 rounded bg-bgc overflow-hidden text-[9px] uppercase font-bold text-t2">
+                {['name', 'phone', 'email', 'address'].map(k => (
+                  <button
+                    key={k}
+                    className={`px-2 py-1 border-r border-b0 last:border-r-0 hover:bg-bg2 transition-colors ${sortConfig.key === k ? "text-cyan-brand bg-bg3" : ""}`}
+                    onClick={() => setSortConfig({ key: k, direction: sortConfig.key === k && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
+                  >
+                    {k === 'name' ? 'Nombre' : k === 'phone' ? 'Tel' : k === 'email' ? 'Email' : 'Dir'}
+                    {sortConfig.key === k && (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {scrapeResults.length === 0 && !scraping && (
+            <div className="h-full flex items-center justify-center border border-dashed border-b0 rounded-xl text-t2 text-xs italic text-center px-8">
+              Nada que mostrar. Inicia un scrape para ver resultados o usa los dorks de las otras pestañas.
+            </div>
+          )}
+
+          <div className="flex-1 space-y-3">
+            {sortedAndFilteredLeads.map((lead, idx) => (
+              <LeadCard key={idx} lead={lead} />
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-bg0 border border-b0 rounded-xl p-3 flex flex-col">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[9px] font-bold text-t2 uppercase tracking-widest block">Logs de Ejecución</span>
+            <div className="flex gap-2">
+              {scrapeLog.length > 0 && (
+                <button className="text-[9px] text-blue-brand hover:underline flex items-center gap-1" onClick={exportScrapeLog}>
+                  <FileText className="w-2.5 h-2.5" /> Log
+                </button>
+              )}
+              {(allHistoryLogs.length > 0 || scrapeLog.length > 0) && (
+                <button className="text-[9px] text-cyan-brand hover:underline flex items-center gap-1" onClick={exportAllLogs}>
+                  <Database className="w-2.5 h-2.5" /> Todo
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto font-mono text-[10px] space-y-1.5 scrollbar-thin">
+            {scrapeLog.map((log, idx) => (
+              <div key={idx} className="flex gap-2">
+                <span className="text-t2 shrink-0">[{log.time}]</span>
+                <span className={log.msg.includes("❌") ? "text-red-brand" : log.msg.includes("✅") ? "text-green-brand" : "text-t1"}>{log.msg}</span>
+              </div>
+            ))}
+            {scraping && <div className="animate-pulse text-cyan-brand">_ procesando búsqueda en tiempo real...</div>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
