@@ -44,7 +44,9 @@ export default function App() {
     geocoding, mapParams, setMapParams,
     checkInputs, addLog, searchLocation: scraperSearchLoc,
     runAIScrape, runBatchScrape, autoStart,
-    exportLeadsCSV: scraperExportCSV, generatePythonScript: scraperGenPy,
+    exportLeadsCSV: scraperExportCSV,
+    generatePythonScript,
+    downloadPythonScript,
     exportScrapeLog, exportAllLogs,
     sortedAndFilteredLeads
   } = useScraper(niche, city, zone, year, region, R, TEMPLATES, (m: string) => showToast(m), setShowErrors);
@@ -219,7 +221,8 @@ export default function App() {
                   setTab={setTab} exportLeadsCSV={scraperExportCSV}
                   scrapeLog={scrapeLog} exportScrapeLog={exportScrapeLog}
                   allHistoryLogs={allHistoryLogs} exportAllLogs={exportAllLogs}
-                  generatePythonScript={() => scraperGenPy(TEMPLATES, niche, city, zone, year)}
+                   generatePythonScript={scraperGenPy}
+                  downloadPythonScript={scraperDownloadPy}
                   autoStart={autoStart}
                   aiProvider={aiProvider} setAiProvider={setAiProvider}
                   orModel={orModel} setOrModel={setOrModel}
