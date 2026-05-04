@@ -26,6 +26,7 @@ interface ScraperTabProps {
   allHistoryLogs: LogEntry[];
   exportAllLogs: () => void;
   generatePythonScript: () => void;
+  autoStart: (query: string) => void;
   aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs";
   setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs") => void;
   orModel: string;
@@ -48,6 +49,7 @@ export function ScraperTab({
   sortedAndFilteredLeads, setTab, exportLeadsCSV, scrapeLog,
   exportScrapeLog, allHistoryLogs, exportAllLogs,
   generatePythonScript,
+  autoStart,
   aiProvider, setAiProvider,
   orModel, setOrModel
 }: ScraperTabProps) {
@@ -71,6 +73,10 @@ export function ScraperTab({
     const key = KEY_MAP[provider as keyof typeof KEY_MAP];
     if (value.trim()) {
       localStorage.setItem(`osint_${key}`, value.trim());
+      // Auto-start if query is present and key is now valid
+      if (scrapeQuery.trim()) {
+        autoStart(scrapeQuery);
+      }
     } else {
       localStorage.removeItem(`osint_${key}`);
     }

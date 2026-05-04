@@ -43,7 +43,7 @@ export default function App() {
     leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
     geocoding, mapParams, setMapParams,
     checkInputs, addLog, searchLocation: scraperSearchLoc,
-    runAIScrape, runBatchScrape,
+    runAIScrape, runBatchScrape, autoStart,
     exportLeadsCSV: scraperExportCSV, generatePythonScript: scraperGenPy,
     exportScrapeLog, exportAllLogs,
     sortedAndFilteredLeads
@@ -220,6 +220,9 @@ export default function App() {
                   scrapeLog={scrapeLog} exportScrapeLog={exportScrapeLog}
                   allHistoryLogs={allHistoryLogs} exportAllLogs={exportAllLogs}
                   generatePythonScript={() => scraperGenPy(TEMPLATES, niche, city, zone, year)}
+                  autoStart={autoStart}
+                  aiProvider={aiProvider} setAiProvider={setAiProvider}
+                  orModel={orModel} setOrModel={setOrModel}
                 />
               </motion.div>
             )}
