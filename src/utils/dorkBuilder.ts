@@ -111,18 +111,18 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         name: "Google My Business", icon: null, color: "#4285F4",
         desc: "Negocios en Google Maps sin presencia web",
         templates: [
-          { name: "Perfiles de negocios", query: `site:${R.maps}/place/ "{NICHE}" "{CITY}"`, desc: "Perfiles GMB — muchos sin web propia", proTip: "Filtra perfiles que no tienen sitio web vinculado" },
-          { name: "Pocas reseñas", query: `site:${R.google}/maps "{NICHE}" "{CITY}" (${kws("review", 3)})`, desc: "Negocios que necesitan gestión de reseñas", proTip: "Busca menos de 10 reseñas para encontrar oportunidades" },
-          { name: "Negocios nuevos", query: `"{NICHE}" "{CITY}" (${kws("open", 3)}) after:{YEAR}-01-01`, desc: "Negocios recientemente abiertos", proTip: "Usa after: para encontrar negocios nuevos este año" },
+          { name: "Directorios locales", query: `"{NICHE}" "{CITY}" ${R.dirs.length ? R.dirs.slice(0,2).map((d: string) => `site:${d}`).join(" OR ") : `site:paginasamarillas.com`}`, desc: "Encontrar en PaginasAmarillas, Cylex, etc.", proTip: "Los directorios listan negocios con datos de contacto" },
+          { name: "Contacto expuesto", query: `"{NICHE}" "{CITY}" ("contacto" OR "teléfono" OR "llamar") -site:instagram.com -site:facebook.com`, desc: "Páginas con datos de contacto visibles", proTip: "Busca 'contacto' excluyendo redes sociales" },
+          { name: "Negocios nuevos", query: `"{NICHE}" "{CITY}" ("nuevo" OR "inauguración" OR "abrimos") after:{YEAR}-01-01`, desc: "Aperturas recientes", proTip: "Usa after:{YEAR}-01-01 para este año" },
         ]
       },
     instagram: {
         name: "Instagram Leads", icon: null, color: "#E1306C",
         desc: "Cuentas IG de negocios sin website",
         templates: [
-          { name: "Solo perfiles", query: `site:instagram.com "{NICHE}" "{CITY}" -inurl:/p/ -inurl:/reel/`, desc: "Filtra posts individuales", proTip: "Excluye /p/ y /reel/ para ver solo perfiles" },
-          { name: "Linktree users", query: `site:instagram.com "{NICHE}" "{CITY}" "linktr.ee" OR "linktree"`, desc: "Usan Linktree = sin web propia", proTip: "Linktree indica que no tienen sitio web propio" },
-          { name: "Email en bio", query: `site:instagram.com "{NICHE}" "{CITY}" "@gmail.com" OR "@hotmail.com"`, desc: "Email personal visible en bio", proTip: "Busca @gmail o @hotmail en la bio del perfil" },
+          { name: "Perfiles IG", query: `site:instagram.com "{NICHE}" "{CITY}" -inurl:/p/ -inurl:/reel/`, desc: "Perfiles (no posts)", proTip: "Excluye /p/ y /reel/ para ver solo perfiles" },
+          { name: "Linktree", query: `site:instagram.com "{NICHE}" "{CITY}" "linktr.ee" OR "linktree"`, desc: "Usan Linktree", proTip: "Linktree = no tienen web propia" },
+          { name: "Email en bio", query: `site:instagram.com "{NICHE}" "{CITY}" "@" `, desc: "Emails visibles en bio", proTip: "Busca @ para encontrar emails" },
         ]
       },
     obsolete: {
@@ -137,18 +137,18 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         name: "Emails & Datos", icon: null, color: "#00C853",
         desc: "Datos de contacto expuestos públicos",
         templates: [
-          { name: "Emails en docs", query: `filetype:pdf OR filetype:xlsx "{NICHE}" "{CITY}" "@gmail.com" OR "@hotmail.com"`, desc: "Archivos con emails expuestos", proTip: "PDFs y XLSX a menudo exponen emails de contacto" },
-          { name: "WhatsApp", query: `"{NICHE}" "{CITY}" "wa.me/" OR "api.whatsapp.com/send"`, desc: "Links directos de WhatsApp", proTip: "wa.me/ links son clicks-to-chat directos" },
-          { name: "Directorios", query: `"{NICHE}" "{CITY}" (${R.dirs.slice(0, 2).map((d: string) => `site:${d}`).join(" OR ")})`, desc: "Directorios específicos de la región", proTip: "Cylex, PaginasAmillas, etc. suelen listar emails" },
+          { name: "Emails en docs", query: `filetype:pdf OR filetype:xlsx "{NICHE}" "{CITY}" "@" `, desc: "PDFs/XLSX con emails", proTip: "Busca @ en archivos" },
+          { name: "WhatsApp", query: `"{NICHE}" "{CITY}" "wa.me" OR "whatsapp.com"`, desc: "Links de WhatsApp", proTip: "wa.me/ = click-to-chat" },
+          { name: "Directorios", query: `"{NICHE}" "{CITY}" ${R.dirs.length ? R.dirs.slice(0,2).map((d: string) => `site:${d}`).join(" OR ") : `"paginasamarillas"`}`, desc: "En directorios", proTip: "Directorios locales tienen emails" },
         ]
       },
     social: {
         name: "Redes Sociales", icon: null, color: "#7C4DFF",
         desc: "Presencia en redes sin sitio web propio",
         templates: [
-          { name: "Facebook Only", query: `site:facebook.com "{NICHE}" "{CITY}" -inurl:www. -inurl:.com/`, desc: "Negocios que solo operan en FB", proTip: "Filtra www. y .com/ para evitar posts" },
-          { name: "LinkedIn Co.", query: `site:linkedin.com/company/ "{NICHE}" "{CITY}"`, desc: "Perfiles de empresa en LinkedIn", proTip: "Ideal para B2B y servicios profesionales" },
-          { name: "TikTok Leads", query: `site:tiktok.com "{NICHE}" "{CITY}"`, desc: "Emprendedores activos en TikTok", proTip: "TikTok indica negocio joven y digital" },
+          { name: "Facebook", query: `site:facebook.com "{NICHE}" "{CITY}" -inurl:/posts/ -inurl:/photos/`, desc: "Páginas de FB", proTip: "Excluye posts y fotos para ver páginas" },
+          { name: "LinkedIn", query: `site:linkedin.com/company/ "{NICHE}" "{CITY}"`, desc: "Empresas en LinkedIn", proTip: "Ideal para B2B" },
+          { name: "TikTok", query: `site:tiktok.com "{NICHE}" "{CITY}"`, desc: "Emprendedores en TikTok", proTip: "TikTok = negocio digital" },
         ]
       },
     regional: {
@@ -164,18 +164,20 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         name: "Power Combos", icon: null, color: "#FF9100",
         desc: "Combinaciones de alta precisión",
         templates: [
-          { name: "Hot Leads", query: `"{NICHE}" "{CITY}" ("@gmail.com" OR "@hotmail.com" OR "wa.me") -site:instagram.com -site:facebook.com`, desc: "Contactos directos fuera de redes", proTip: "Excluye IG/FB para encontrar emails directos" },
-          { name: "Freelancers", query: `"{NICHE}" "{CITY}" (${kws("independent")}) ("whatsapp" OR "@gmail")`, desc: "Profesionales independientes", proTip: "Busca palabras como 'freelance', 'independiente', 'autónomo'" },
-          { name: "Weak SEO", query: `"{NICHE}" "{CITY}" -site:instagram.com -site:facebook.com inurl:${k.contact.split("|")[0]}`, desc: "Sitios con bajo SEO (sin redes)", proTip: "Sin IG/FB + inurl:contacto = oportunidad" },
+          { name: "Hot Leads", query: `"{NICHE}" "{CITY}" ("@gmail" OR "@hotmail" OR "wa.me") -site:instagram.com -site:facebook.com`, desc: "Contactos directos", proTip: "Excluye IG/FB para emails directos" },
+          { name: "Freelancers", query: `"{NICHE}" "{CITY}" ("freelance" OR "independiente" OR "autónomo")`, desc: "Profesionales independientes", proTip: "Busca 'freelance' o 'independiente'" },
+          { name: "Bajo SEO", query: `"{NICHE}" "{CITY}" -site:instagram.com -site:facebook.com "contacto"`, desc: "Sin IG/FB + contacto", proTip: "Sin redes + contacto = oportunidad" },
         ]
       }
   };
 }
 
 export function fillTemplate(q: string, niche: string, city: string, zone: string, year: number, showErrors: boolean): string {
+  const n = niche || (showErrors ? "!!!" : "dentista");
+  const c = city || (showErrors ? "!!!" : "medellin");
   return q
-    .replace(/\{NICHE\}/g, niche || (showErrors ? "!!!" : "restaurante"))
-    .replace(/\{CITY\}/g, city || (showErrors ? "!!!" : "bogota"))
+    .replace(/\{NICHE\}/g, n)
+    .replace(/\{CITY\}/g, c)
     .replace(/\{YEAR\}/g, String(year))
     .replace(/\{ZONE\}/g, zone || (showErrors ? "!!!" : "centro"));
 }
