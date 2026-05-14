@@ -62,9 +62,15 @@ export default function QueryBuilder({ builtQuery, favorites, toggleFavorite, co
             <button className={`btn border border-b0 bg-bg1 hover:bg-bg2 ${favorites.includes(builtQuery) ? "text-yellow-brand" : "text-t0"}`} onClick={() => toggleFavorite(builtQuery)}>
               <Star className={`w-3.5 h-3.5 ${favorites.includes(builtQuery) ? "fill-current" : ""}`} />
             </button>
-            <button className="btn border border-b0 bg-bg1 text-t0 hover:bg-bg2 flex-1 justify-center" onClick={() => openSearch(builtQuery)}>Google</button>
-            <button className="btn border border-b0 bg-bg1 text-t0 hover:bg-bg2" onClick={() => openSearch(builtQuery, "yandex")}>Yandex</button>
-            <button className="btn border border-b0 bg-bg1 text-t0 hover:bg-bg2" onClick={() => window.open(`https://www.google.com/maps/search/${encodeURIComponent(builtQuery)}`, "_blank")}>Maps</button>
+            <button className="btn border border-b0 bg-bg1 text-blue-400 hover:bg-bg2" onClick={() => openSearch(builtQuery)}>Google</button>
+            <button className="btn border border-b0 bg-bg1 text-cyan-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "bing")}>Bing</button>
+            <button className="btn border border-b0 bg-bg1 text-orange-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "ddg")}>DDG</button>
+            <button className="btn border border-b0 bg-bg1 text-red-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "yandex")}>Yandex</button>
+            <button className="btn border border-b0 bg-bg1 text-orange-300 hover:bg-bg2" onClick={() => openSearch(builtQuery, "brave")}>Brave</button>
+            <button className="btn border border-b0 bg-bg1 text-purple-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "mojeek")}>Mojeek</button>
+            <button className="btn border border-b0 bg-bg1 text-emerald-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "maps")}>Maps</button>
+            <button className="btn border border-b0 bg-bg1 text-sky-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "linkedin_people")}>LinkedIn</button>
+            <button className="btn border border-b0 bg-bg1 text-t2 hover:bg-bg2" onClick={() => openSearch(builtQuery, "shodan")}>Shodan</button>
             <button className="btn bg-blue-brand text-white hover:opacity-90 px-6" onClick={() => { setScrapeQuery(builtQuery); setTab("scraper"); }}>Scrape</button>
           </div>
         )}
