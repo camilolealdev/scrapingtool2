@@ -70,15 +70,60 @@ export default function App() {
 
   const openSearch = useCallback((query: string, engineKey = "google", direct = false) => {
     if (!direct && !query.includes("!!!") && !checkInputs()) return;
-    const googleDomain = R.google;
-    const urls: Record<string, string> = {
-      google: `https://www.${googleDomain}/search?q=`,
-      bing: `https://www.bing.com/search?cc=${R.bing_loc}&q=`,
-      ddg: `https://duckduckgo.com/?kl=${R.ddg_region}&q=`,
-      yandex: `https://yandex.com/search/?text=`,
-      maps: `https://www.${googleDomain}/maps/search/`,
+
+    // Engines that use q= or similar standard params
+    const stdUrls: Record<string, string> = {
+      google:            `https://www.${R.google}/search?q=`,
+      bing:              `https://www.bing.com/search?cc=${R.bing_loc}&q=`,
+      ddg:               `https://duckduckgo.com/?kl=${R.ddg_region}&q=`,
+      yandex:            `https://yandex.com/search/?text=`,
+      brave:             `https://search.brave.com/search?q=`,
+      mojeek:            `https://www.mojeek.com/search?q=`,
+      maps:              `https://www.${R.google}/maps/search/`,
+      linkedin:          `https://www.linkedin.com/search/results/all/?keywords=`,
+      linkedin_people:   `https://www.linkedin.com/search/results/people/?keywords=`,
+      linkedin_companies:`https://www.linkedin.com/search/results/companies/?keywords=`,
+      twitter:           `https://x.com/search?q=`,
+      instagram:         `https://www.google.com/search?q=site:instagram.com+`,
+      tiktok:            `https://www.google.com/search?q=site:tiktok.com+`,
+      youtube:           `https://www.youtube.com/results?search_query=`,
+      facebook:          `https://www.google.com/search?q=site:facebook.com+`,
+      reddit:            `https://www.reddit.com/search/?q=`,
+      yelp:              `https://www.yelp.com/search?find_desc=`,
+      yellowpages:       `https://www.yellowpages.com/search?search_terms=`,
+      manta:             `https://www.manta.com/search?search=`,
+      clutch:            `https://clutch.co/search?search_term=`,
+      bbb:               `https://www.bbb.org/search?find_text=`,
+      trustpilot:        `https://www.trustpilot.com/search?query=`,
+      tripadvisor:       `https://www.tripadvisor.com/Search?q=`,
+      shodan:            `https://www.shodan.io/search?query=`,
+      censys:            `https://search.censys.io/search?resource=hosts&q=`,
+      github:            `https://github.com/search?type=code&q=`,
+      scholar:           `https://scholar.google.com/scholar?q=`,
     };
-    window.open(urls[engineKey] + encodeURIComponent(query), "_blank");
+
+    // Special engines with non-standard URL construction
+    const specialEngines: Record<string, (q: string) => string> = {
+      // MercadoLibre: use their search API path (spaces → '+')
+      mercadolibre: (q) => {
+        const base = R.ml ? `https://listado.${R.ml}` : `https://listado.mercadolibre.com.co`;
+        return `${base}/${q.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9\-áéíóúñüÁÉÍÓÚÑÜ]/g, '')}`;
+      },
+      // OLX: path-based search
+      olx: (q) => `https://www.olx.com.co/items/q-${encodeURIComponent(q).replace(/%20/g, '-')}`,
+      // Computrabajo: path-based
+      computrabajo: (q) => `https://co.computrabajo.com/trabajo-de-${encodeURIComponent(q).replace(/%20/g, '-')}`,
+    };
+
+    let url: string;
+    if (specialEngines[engineKey]) {
+      url = specialEngines[engineKey](query);
+    } else {
+      const base = stdUrls[engineKey] ?? `https://www.${R.google}/search?q=`;
+      url = base + encodeURIComponent(query);
+    }
+
+    window.open(url, "_blank");
     setHistory(prev => [{
       query, engine: engineKey,
       time: new Date().toLocaleTimeString(),
@@ -93,7 +138,7 @@ export default function App() {
 
   const builtQuery = useMemo(() => {
     if (!selectedOps.length && !custom) return "";
-    const allOps = [...OPERATORS.google, ...OPERATORS.bing, ...OPERATORS.ddg];
+    const allOps = Object.values(OPERATORS).flat();
     const opsStr = selectedOps
       .map(id => allOps.find(o => o.id === id)?.example || "")
       .filter(Boolean)
