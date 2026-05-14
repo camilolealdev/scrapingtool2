@@ -18,8 +18,6 @@ interface TemplatesTabProps {
   openSearch: (query: string, engine?: string) => void;
   setScrapeQuery: (v: string) => void;
   setTab: (v: string) => void;
-  showToast: (m: string) => void;
-  copyToClipboard: (t: string) => void;
 }
 
 export function TemplatesTab({
@@ -30,18 +28,25 @@ export function TemplatesTab({
 }: TemplatesTabProps) {
   return (
     <div>
-      <div className="flex flex-wrap gap-3 mb-6 items-center">
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none flex-1">
-          {Object.entries(TEMPLATES).map(([k, c]) => (
-            <button
-              key={k}
-              className={`btn border border-b0 transition-all font-medium whitespace-nowrap ${activeCategory === k ? "text-white" : "bg-bg1 text-t2"}`}
-              style={activeCategory === k ? { background: c.color, borderColor: c.color } : {}}
-              onClick={() => setActiveCategory(k)}
-            >
-              {c.icon} {c.name}
-            </button>
-          ))}
+      <div className="flex flex-col gap-2 mb-5">
+        <div className="flex flex-wrap gap-1.5">
+          {Object.entries(TEMPLATES).map(([k, c]) => {
+            const isActive = activeCategory === k;
+            return (
+              <button
+                key={k}
+                onClick={() => setActiveCategory(k)}
+                className={`flex items-center gap-1.5 px-2.5 py-[5px] rounded-lg border text-[10px] font-semibold tracking-wide transition-all duration-150 whitespace-nowrap
+                  ${isActive ? 'text-white' : 'bg-bg1 border-b0 text-t2 hover:text-white'}`}
+                style={isActive
+                  ? { background: `${c.color}cc`, borderColor: c.color, boxShadow: `0 0 10px ${c.color}50` }
+                  : {}}
+              >
+                <span className="text-[11px] leading-none">{c.icon}</span>
+                {c.name}
+              </button>
+            );
+          })}
         </div>
         <div className="flex gap-2 bg-bgc border border-b0 p-1.5 rounded-xl w-full lg:w-auto">
           <div className="relative">

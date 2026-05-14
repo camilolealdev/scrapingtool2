@@ -1,5 +1,4 @@
 import { Bot, Terminal, Instagram, Mail, Zap, Download, MapPin, Search } from "lucide-react";
-import { scrapeQuery, setScrapeQuery, scrapeResults, setScrapeResults, scraping, scrapeLog, scraperMode, setScraperMode, batchInput, setBatchInput, runAIScrape, runBatchScrape, exportLeadsCSV, sortedAndFilteredLeads, leadsSearch, setLeadsSearch, sortConfig, setSortConfig, showToast, generatePythonScript, region } from './App';
 
 interface Props {
   scrapeQuery: string;

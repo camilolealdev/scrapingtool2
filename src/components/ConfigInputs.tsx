@@ -25,9 +25,9 @@ export function ConfigInputs({ niche, setNiche, city, setCity, zone, setZone, sh
         <div className="relative group">
           <input id="city-input" name="city" className={`inp pr-10 ${showErrors && !city.trim() ? "border-red-brand bg-red-brand/5" : ""}`}
             placeholder="ej: bogota, CC Andino..." value={city} onChange={e => setCity(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && onGeocode(city)} />
+            onKeyDown={e => e.key === "Enter" && searchLocation(city)} />
           <button className={`absolute right-2 top-1/2 -translate-y-1/2 text-t2 hover:text-blue-brand transition-colors ${geocoding ? "animate-spin" : ""}`}
-            onClick={() => onGeocode(city)} title="Geocodificar">
+            onClick={() => searchLocation(city)} title="Geocodificar">
             <Navigation className="w-4 h-4" />
           </button>
         </div>
