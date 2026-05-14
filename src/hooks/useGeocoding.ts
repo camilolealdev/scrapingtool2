@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export function useGeocoding(showToast: (msg: string) => void) {
   const [geocoding, setGeocoding] = useState(false);
