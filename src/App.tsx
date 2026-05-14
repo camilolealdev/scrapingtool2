@@ -48,7 +48,9 @@ export default function App() {
     generatePythonScript,
     downloadPythonScript,
     exportScrapeLog, exportAllLogs,
-    sortedAndFilteredLeads
+    sortedAndFilteredLeads,
+    aiProvider, setAiProvider,
+    orModel, setOrModel
   } = useScraper(niche, city, zone, year, region, R, TEMPLATES, (m: string) => showToast(m), setShowErrors);
   const { history, setHistory, addToHistory } = useHistory();
   const { favorites, setFavorites, toggleFavorite } = useFavorites();
@@ -266,8 +268,8 @@ export default function App() {
                   setTab={setTab} exportLeadsCSV={scraperExportCSV}
                   scrapeLog={scrapeLog} exportScrapeLog={exportScrapeLog}
                   allHistoryLogs={allHistoryLogs} exportAllLogs={exportAllLogs}
-                   generatePythonScript={scraperGenPy}
-                  downloadPythonScript={scraperDownloadPy}
+                  generatePythonScript={generatePythonScript}
+                  downloadPythonScript={downloadPythonScript}
                   autoStart={autoStart}
                   aiProvider={aiProvider} setAiProvider={setAiProvider}
                   orModel={orModel} setOrModel={setOrModel}
