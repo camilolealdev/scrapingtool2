@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Zap, Sun, Moon } from "lucide-react";
+import { GlobeHero } from "./GlobeHero";
 
 function applyTheme(light: boolean) {
   document.documentElement.classList.toggle('light', light);
@@ -19,22 +20,29 @@ export function Header() {
   }, [isLight]);
 
   return (
-    <header className="hd text-center mb-8 border-b border-b0 pb-6 relative">
+    <header className="hd mb-8 border-b border-b0 pb-6 relative">
       <button
         onClick={() => setIsLight(v => !v)}
-        className="absolute right-0 top-0 btn bg-bg1 border border-b0 text-t2 hover:text-t0 hover:border-b1 transition-all px-3 py-2"
+        className="absolute right-0 top-0 btn bg-bg1 border border-b0 text-t2 hover:text-t0 hover:border-b1 transition-all px-3 py-2 z-10"
         title={isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
       >
         {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
       </button>
-      <div className="badge">
-        <Zap className="w-3 h-3 fill-cyan-brand" /> OSINT LEAD FINDER v5
+      <div className="flex items-center gap-4">
+        <div className="flex-1 text-center lg:text-left">
+          <div className="badge">
+            <Zap className="w-3 h-3 fill-cyan-brand" /> OSINT LEAD FINDER v5
+          </div>
+          <h1>Google Dorking Lab</h1>
+          <p className="text-t1 text-sm max-w-2xl mx-auto lg:mx-0">
+            Explora leads ocultos en diversas regiones usando operadores avanzados de búsqueda.
+            Optimizado para prospección B2B y recolección de datos públicos.
+          </p>
+        </div>
+        <div className="hidden lg:flex items-center justify-center shrink-0 -my-2">
+          <GlobeHero isLight={isLight} />
+        </div>
       </div>
-      <h1>Google Dorking Lab</h1>
-      <p className="text-t1 text-sm max-w-2xl mx-auto">
-        Explora leads ocultos en diversas regiones usando operadores avanzados de búsqueda.
-        Optimizado para prospección B2B y recolección de datos públicos.
-      </p>
     </header>
   );
 }
