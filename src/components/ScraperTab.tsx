@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { getStoredKey } from '../utils/envKeys';
-import { Bot, Terminal, Instagram, Mail, Zap, MapPin, Download, Search, FileText, Database } from "lucide-react";
+import { Bot, Terminal, Instagram, Mail, Zap, MapPin, Download, Search, FileText, Database, Eye, EyeOff, Copy, Check } from "lucide-react";
 import { ScrapeResult, LogEntry } from '../types';
 import { LeadCard } from './LeadCard';
 
@@ -71,6 +71,17 @@ export function ScraperTab({
 }: ScraperTabProps) {
 
   const getSavedKey = getStoredKey;
+  const [showKeys, setShowKeys] = useState(false);
+  const [copied, setCopied] = useState('');
+
+  const copyKey = (envKey: string) => {
+    const val = getStoredKey(envKey);
+    if (!val) return;
+    navigator.clipboard.writeText(val).then(() => {
+      setCopied(envKey);
+      setTimeout(() => setCopied(''), 1500);
+    });
+  };
 
   const hasValidKey = () => {
     const key = KEY_MAP[aiProvider];
@@ -169,14 +180,38 @@ export function ScraperTab({
           </div>
 
           {/* Key input for current provider */}
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <span className="text-[9px] text-t2 uppercase tracking-widest font-bold">API Key</span>
+            <button
+              onClick={() => setShowKeys(v => !v)}
+              className="btn bg-bg0 border border-b0 text-t2 hover:text-t0 px-1.5 py-0.5 text-[9px] gap-1"
+              title={showKeys ? 'Ocultar claves' : 'Mostrar claves'}
+            >
+              {showKeys ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+              {showKeys ? 'Ocultar' : 'Mostrar'}
+            </button>
+          </div>
+
           {aiProvider !== 'google-cs' && (
             <div className="flex gap-2">
-              <input
-                className="inp flex-1 text-[10px] font-mono"
-                placeholder={PROVIDER_LABELS[aiProvider]?.placeholder ?? 'API Key...'}
-                defaultValue={getSavedKey(KEY_MAP[aiProvider as keyof typeof KEY_MAP])}
-                onChange={e => handleKeyChange(aiProvider, e.target.value)}
-              />
+              <div className="relative flex-1">
+                <input
+                  className="inp w-full text-[10px] font-mono pr-8"
+                  type={showKeys ? 'text' : 'password'}
+                  placeholder={PROVIDER_LABELS[aiProvider]?.placeholder ?? 'API Key...'}
+                  defaultValue={getSavedKey(KEY_MAP[aiProvider as keyof typeof KEY_MAP])}
+                  onChange={e => handleKeyChange(aiProvider, e.target.value)}
+                />
+                <button
+                  onClick={() => copyKey(KEY_MAP[aiProvider as keyof typeof KEY_MAP])}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-t2 hover:text-t0 transition-colors"
+                  title="Copiar clave"
+                >
+                  {copied === KEY_MAP[aiProvider as keyof typeof KEY_MAP]
+                    ? <Check className="w-3 h-3 text-green-brand" />
+                    : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
               {hasValidKey() && (
                 <button
                   className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px] whitespace-nowrap"
@@ -191,18 +226,42 @@ export function ScraperTab({
 
           {aiProvider === 'google-cs' && (
             <div className="flex gap-2">
-              <input
-                className="inp flex-1 text-[10px] font-mono"
-                placeholder="Google CS API Key..."
-                defaultValue={getSavedKey(KEY_MAP['google-cs'])}
-                onChange={e => handleKeyChange('google-cs', e.target.value)}
-              />
-              <input
-                className="inp flex-1 text-[10px] font-mono"
-                placeholder="CX ID..."
-                defaultValue={getSavedKey(CX_KEY)}
-                onChange={e => handleCxChange(e.target.value)}
-              />
+              <div className="relative flex-1">
+                <input
+                  className="inp w-full text-[10px] font-mono pr-8"
+                  type={showKeys ? 'text' : 'password'}
+                  placeholder="Google CS API Key..."
+                  defaultValue={getSavedKey(KEY_MAP['google-cs'])}
+                  onChange={e => handleKeyChange('google-cs', e.target.value)}
+                />
+                <button
+                  onClick={() => copyKey(KEY_MAP['google-cs'])}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-t2 hover:text-t0 transition-colors"
+                  title="Copiar clave"
+                >
+                  {copied === KEY_MAP['google-cs']
+                    ? <Check className="w-3 h-3 text-green-brand" />
+                    : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
+              <div className="relative flex-1">
+                <input
+                  className="inp w-full text-[10px] font-mono pr-8"
+                  type={showKeys ? 'text' : 'password'}
+                  placeholder="CX ID..."
+                  defaultValue={getSavedKey(CX_KEY)}
+                  onChange={e => handleCxChange(e.target.value)}
+                />
+                <button
+                  onClick={() => copyKey(CX_KEY)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-t2 hover:text-t0 transition-colors"
+                  title="Copiar CX"
+                >
+                  {copied === CX_KEY
+                    ? <Check className="w-3 h-3 text-green-brand" />
+                    : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
               {hasValidKey() && (
                 <button
                   className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px] whitespace-nowrap"

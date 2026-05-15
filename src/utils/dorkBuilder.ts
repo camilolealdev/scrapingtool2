@@ -1,9 +1,10 @@
 import type { Template, CategoryTemplate, Region } from '../types';
 
 export const REGIONS: Record<string, Region> = {
+  // dirs ordered: most-popular portal first → dirsTop3 always picks the best 3
   co: { name: "Colombia", flag: "🇨🇴", lang: "es", google: "google.com.co", tld: ".com.co", bing_loc: "co", ddg_region: "co-es",
     maps: "google.com.co/maps", ml: "mercadolibre.com.co", pa: "paginasamarillas.com.co",
-    dirs: ["cylex.com.co","infoisinfo.com.co","tupalo.com","empresite.eleconomistaamerica.co","directorioempresarial.com.co","colombianegocios.com"],
+    dirs: ["tripadvisor.com","cylex.com.co","infoisinfo.com.co","colombianegocios.com","tupalo.com","empresite.eleconomistaamerica.co","directorioempresarial.com.co"],
     apps: ["Rappi","Domicilios.com","iFood"], phone: "+57",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular|móvil|llamar", order: "pedidos|domicilios|envíos|delivery",
       open: "abrimos|inauguración|apertura|nuevo local", review: "reseña|reseñas|review|reviews", schedule: "horario|horarios",
@@ -11,7 +12,7 @@ export const REGIONS: Record<string, Region> = {
   },
   mx: { name: "México", flag: "🇲🇽", lang: "es", google: "google.com.mx", tld: ".com.mx", bing_loc: "mx", ddg_region: "mx-es",
     maps: "google.com.mx/maps", ml: "mercadolibre.com.mx", pa: "seccionamarilla.com.mx",
-    dirs: ["cylex.com.mx","infoisinfo.com.mx","guialis.com.mx","mexpages.com","datamexico.org"],
+    dirs: ["tripadvisor.com","cylex.com.mx","infoisinfo.com.mx","guialis.com.mx","mexpages.com","comerzia.com.mx","datamexico.org"],
     apps: ["Rappi","Didi Food","Uber Eats","Sin Delantal"], phone: "+52",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular", order: "pedidos|a domicilio|envíos|delivery",
       open: "abrimos|inauguración|apertura", review: "reseña|reseñas|review|opinión", schedule: "horario|horarios",
@@ -19,7 +20,7 @@ export const REGIONS: Record<string, Region> = {
   },
   ar: { name: "Argentina", flag: "🇦🇷", lang: "es", google: "google.com.ar", tld: ".com.ar", bing_loc: "ar", ddg_region: "ar-es",
     maps: "google.com.ar/maps", ml: "mercadolibre.com.ar", pa: "paginasamarillas.com.ar",
-    dirs: ["cylex.com.ar","guiafe.com.ar","donempresa.com","guiadeempresas.net"],
+    dirs: ["tripadvisor.com","cylex.com.ar","guiafe.com.ar","dateas.com","donempresa.com","guiadeempresas.net"],
     apps: ["Rappi","PedidosYa","Glovo"], phone: "+54",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular", order: "pedidos|delivery|envíos",
       open: "abrimos|inauguración|apertura", review: "reseña|reseñas|review", schedule: "horario|horarios",
@@ -27,7 +28,7 @@ export const REGIONS: Record<string, Region> = {
   },
   cl: { name: "Chile", flag: "🇨🇱", lang: "es", google: "google.cl", tld: ".cl", bing_loc: "cl", ddg_region: "cl-es",
     maps: "google.cl/maps", ml: "mercadolibre.cl", pa: "paginasamarillas.cl",
-    dirs: ["cylex.cl","amarillas.cl","guioteca.com","chilealimentos.cl"],
+    dirs: ["tripadvisor.com","amarillas.cl","cylex.cl","guioteca.com","todoschile.cl","chilealimentos.cl"],
     apps: ["Rappi","PedidosYa","Cornershop","Justo"], phone: "+56",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular|fono", order: "pedidos|despacho|envíos|delivery",
       open: "abrimos|inauguración|apertura", review: "reseña|reseñas|review", schedule: "horario|horarios",
@@ -35,7 +36,7 @@ export const REGIONS: Record<string, Region> = {
   },
   pe: { name: "Perú", flag: "🇵🇪", lang: "es", google: "google.com.pe", tld: ".com.pe", bing_loc: "pe", ddg_region: "pe-es",
     maps: "google.com.pe/maps", ml: "mercadolibre.com.pe", pa: "paginasamarillas.com.pe",
-    dirs: ["cylex.com.pe","infoisinfo.com.pe","negociospe.com"],
+    dirs: ["tripadvisor.com","cylex.com.pe","infoisinfo.com.pe","guialocal.com.pe","negociospe.com","latam-directory.com"],
     apps: ["Rappi","PedidosYa","Yango Eats"], phone: "+51",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular", order: "pedidos|delivery|envíos",
       open: "abrimos|inauguración|apertura", review: "reseña|review|opinión", schedule: "horario|horarios",
@@ -43,7 +44,7 @@ export const REGIONS: Record<string, Region> = {
   },
   ec: { name: "Ecuador", flag: "🇪🇨", lang: "es", google: "google.com.ec", tld: ".com.ec", bing_loc: "ec", ddg_region: "ec-es",
     maps: "google.com.ec/maps", ml: "mercadolibre.com.ec", pa: "paginasamarillas.com.ec",
-    dirs: ["cylex.com.ec","guialocal.com.ec","empresasecuador.com"],
+    dirs: ["tripadvisor.com","cylex.com.ec","guialocal.com.ec","infoisinfo.com.ec","empresasecuador.com","amarillasecuador.com"],
     apps: ["Rappi","PedidosYa","Picap"], phone: "+593",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular", order: "pedidos|delivery|envíos",
       open: "abrimos|inauguración|apertura", review: "reseña|review", schedule: "horario|horarios",
@@ -51,7 +52,7 @@ export const REGIONS: Record<string, Region> = {
   },
   br: { name: "Brasil", flag: "🇧🇷", lang: "pt", google: "google.com.br", tld: ".com.br", bing_loc: "br", ddg_region: "br-pt",
     maps: "google.com.br/maps", ml: "mercadolivre.com.br", pa: null,
-    dirs: ["telelistas.net","guiamais.com.br","apontador.com.br","acibrasil.com.br"],
+    dirs: ["tripadvisor.com","telelistas.net","guiamais.com.br","apontador.com.br","acibrasil.com.br","yelp.com.br"],
     apps: ["iFood","Rappi","Loggi"], phone: "+55",
     kw: { contact: "contato|fale conosco", phone: "telefone|celular|whatsapp", order: "pedidos|delivery|entregas",
       open: "inauguração|abertura|novo", review: "avaliação|avaliações|review", schedule: "horário|horários",
@@ -59,7 +60,7 @@ export const REGIONS: Record<string, Region> = {
   },
   us: { name: "USA", flag: "🇺🇸", lang: "en", google: "google.com", tld: ".com", bing_loc: "us", ddg_region: "us-en",
     maps: "google.com/maps", ml: null, pa: null,
-    dirs: ["yelp.com","yellowpages.com","bbb.org","manta.com","thumbtack.com","angieslist.com","houzz.com"],
+    dirs: ["yelp.com","yellowpages.com","bbb.org","tripadvisor.com","manta.com","thumbtack.com","angieslist.com"],
     apps: ["DoorDash","Uber Eats","GrubHub","Instacart"], phone: "+1",
     kw: { contact: "contact|contact us", phone: "phone|call|cell", order: "order|delivery|pickup",
       open: "now open|grand opening", review: "review|reviews|rating", schedule: "hours|business hours",
@@ -67,11 +68,19 @@ export const REGIONS: Record<string, Region> = {
   },
   es: { name: "España", flag: "🇪🇸", lang: "es", google: "google.es", tld: ".es", bing_loc: "es", ddg_region: "es-es",
     maps: "google.es/maps", ml: null, pa: "paginasamarillas.es",
-    dirs: ["qdq.com","cylex.es","infoisinfo.es","einforma.com","axesor.es"],
+    dirs: ["tripadvisor.com","qdq.com","einforma.com","cylex.es","infoisinfo.es","axesor.es"],
     apps: ["Glovo","Just Eat","Uber Eats"], phone: "+34",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|móvil", order: "pedidos|reparto|delivery",
       open: "abrimos|inauguración|apertura", review: "reseña|reseñas|valoración", schedule: "horario|horarios",
       quote: "presupuesto|cotización", independent: "autónomo|freelance" }
+  },
+  do: { name: "Rep. Dominicana", flag: "🇩🇴", lang: "es", google: "google.com.do", tld: ".com.do", bing_loc: "do", ddg_region: "do-es",
+    maps: "google.com.do/maps", ml: null, pa: "paginasamarillas.com.do",
+    dirs: ["tripadvisor.com","guia-rd.com","cylex.com.do","infoisinfo.com.do","listadominicana.com","negocios.com.do"],
+    apps: ["Uber Eats","PedidosYa","HeyJude"], phone: "+1-809",
+    kw: { contact: "contacto|contáctenos", phone: "teléfono|celular|móvil", order: "pedidos|delivery|envíos",
+      open: "abrimos|inauguración|apertura", review: "reseña|reseñas|review", schedule: "horario|horarios",
+      quote: "cotización|presupuesto", independent: "independiente|freelance" }
   }
 };
 
@@ -518,6 +527,9 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
   const year = new Date().getFullYear();
   const dirsTop2 = R.dirs.slice(0, 2).map((d: string) => `site:${d}`).join(" OR ");
   const dirsTop3 = R.dirs.slice(0, 3).map((d: string) => `site:${d}`).join(" OR ");
+  const dirsTop4 = R.dirs.slice(0, 4).map((d: string) => `site:${d}`).join(" OR ");
+  const dirsTop5 = R.dirs.slice(0, 5).map((d: string) => `site:${d}`).join(" OR ");
+  const dirsAll  = R.dirs.map((d: string) => `site:${d}`).join(" OR ");
 
   return {
     // ── GOOGLE MY BUSINESS / DIRECTORIOS ──────────────────────────────────
@@ -525,8 +537,10 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       name: "Google My Business", icon: null, color: "#4285F4",
       desc: "Negocios en Google Maps sin presencia web",
       templates: [
-        { name: "Directorios locales (top2)", query: `"{NICHE}" "{CITY}" ${dirsTop2}`, desc: "PaginasAmarillas, Cylex, etc.", proTip: "Directorios listan negocios con datos de contacto completos" },
-        { name: "Directorios locales (top3)", query: `"{NICHE}" "{CITY}" ${dirsTop3}`, desc: "Más directorios regionales", proTip: "Combina 3 directorios para más cobertura" },
+        { name: "Portales top 2", query: `"{NICHE}" "{CITY}" ${dirsTop2}`, desc: "Los 2 portales más populares del país", proTip: "Siempre son TripAdvisor + el directorio #1 local" },
+        { name: "Portales top 3", query: `"{NICHE}" "{CITY}" ${dirsTop3}`, desc: "3 portales de mayor tráfico", proTip: "Combina 3 portales para cobertura amplia" },
+        { name: "Portales top 4", query: `"{NICHE}" "{CITY}" ${dirsTop4}`, desc: "4 portales con datos estructurados", proTip: "Añade un cuarto portal para leads adicionales" },
+        { name: "Portales top 5", query: `"{NICHE}" "{CITY}" ${dirsTop5}`, desc: "Los 5 portales líderes por país", proTip: "Máxima cobertura con 5 portales en un solo dork" },
         { name: "Contacto expuesto", query: `"{NICHE}" "{CITY}" (${kws("contact")} OR ${kws("phone")}) -site:instagram.com -site:facebook.com`, desc: "Páginas con datos de contacto visibles", proTip: "Excluye redes para solo páginas web propias" },
         { name: "Negocios nuevos", query: `"{NICHE}" "{CITY}" (${kws("open")}) after:${year-1}-01-01`, desc: "Aperturas recientes de este año", proTip: "Usa after: para encontrar negocios que abrieron recientemente" },
         { name: "Sin web propia", query: `"{NICHE}" "{CITY}" (site:instagram.com OR site:facebook.com OR site:wa.me) -site:.${R.tld}`, desc: "Solo en redes, sin web", proTip: "Alta conversión: necesitan presencia web" },
@@ -738,13 +752,29 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       ]
     },
 
+    // ── PORTALES POPULARES POR PAÍS ────────────────────────────────────────
+    portales: {
+      name: "Portales por País", icon: null, color: "#1565C0",
+      desc: "Los portales de búsqueda y directorios más visitados de cada país",
+      templates: [
+        { name: "TripAdvisor (portal #1)", query: `site:tripadvisor.com "{NICHE}" "{CITY}"`, desc: "Portal de reviews más grande del mundo", proTip: "TripAdvisor tiene teléfono, web y email directo de cada negocio" },
+        ...(R.pa ? [{ name: "Páginas Amarillas + contacto", query: `site:${R.pa} "{NICHE}" "{CITY}" (${kws("phone")})`, desc: "Directorio oficial con filtro de teléfono", proTip: "PA es el directorio más confiable — datos estructurados y verificados" }] : []),
+        { name: "Top 5 portales combo", query: `"{NICHE}" "{CITY}" (${dirsTop5})`, desc: "5 portales más populares en un solo dork", proTip: "Máxima cobertura — usa en Google con num=100 para 100 resultados" },
+        { name: "Top 3 + email/WA", query: `"{NICHE}" "{CITY}" (${dirsTop3}) ("@" OR "wa.me" OR ${kws("phone")})`, desc: "Portales top con contacto directo visible", proTip: "Filtra solo negocios que exponen contacto en el directorio" },
+        { name: "Portales + archivo", query: `"{NICHE}" "{CITY}" (${dirsTop4}) (filetype:pdf OR filetype:xlsx)`, desc: "Documentos descargables en directorios top", proTip: "PDFs de directorios suelen tener bases de datos completas" },
+        { name: "Todos los portales (ALL)", query: `"{NICHE}" "{CITY}" (${dirsAll})`, desc: "Todos los portales del país en un dork", proTip: "Máxima cobertura — puede devolver muchos resultados" },
+        { name: "Bing local + portales", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} (${dirsTop3})`, desc: "Portales filtrados por país en Bing", proTip: "Combina loc: de Bing con site: de directorios para precisión máxima" },
+        { name: "Google Maps + portales", query: `"{NICHE}" "{CITY}" (site:google.com/maps OR ${dirsTop2})`, desc: "Maps + portales top para mayor alcance", proTip: "Google Maps dorks revelan negocios sin web propia" },
+      ]
+    },
+
     // ── BULK DORKS ────────────────────────────────────────────────────────
     bulk: {
       name: "Bulk & Automatización", icon: null, color: "#607D8B",
       desc: "Dorks para generación masiva de leads",
       templates: [
         { name: "Todas las redes", query: `"{NICHE}" "{CITY}" (site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:twitter.com) -inurl:/p/ -inurl:/posts/`, desc: "Todas las redes en un dork", proTip: "Un solo dork para cubrir todas las redes" },
-        { name: "Todos los directorios", query: `"{NICHE}" "{CITY}" (${R.dirs.map((d: string) => `site:${d}`).join(" OR ")})`, desc: "Todos los directorios del país", proTip: "Combina todos los directorios en un solo dork" },
+        { name: "Todos los portales (país)", query: `"{NICHE}" "{CITY}" (${dirsAll})`, desc: "Todos los portales y directorios del país", proTip: "Combina todos los portales en un solo dork — máxima cobertura" },
         { name: "Todos los archivos", query: `"{NICHE}" "{CITY}" (filetype:pdf OR filetype:xlsx OR filetype:csv OR filetype:docx) "@"`, desc: "Todos los tipos de archivo con email", proTip: "Cubre todos los formatos de archivo con emails" },
         { name: "Multi-motor Bing loc", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} (${kws("contact")}) (${kws("phone")})`, desc: "Bing con filtro local", proTip: "Bing loc: es más agresivo que Google para datos locales" },
         { name: "DDG Bang múltiple", query: `!yelp "{NICHE}" "{CITY}"`, desc: "DuckDuckGo bang a Yelp", proTip: "Usa DDG bangs para redirigir a múltiples directorios" },
@@ -780,27 +810,33 @@ export function getBulkDorks(TEMPLATES: Record<string, CategoryTemplate>, niche:
 }
 
 // Build search URL for any registered engine
+// Google max is 100 results/page; Bing max is 50; DDG doesn't support count param
 export function buildSearchUrl(engineId: string, query: string, regionKey?: string): string {
   const engine = SEARCH_ENGINES[engineId];
-  if (!engine) return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  const q = encodeURIComponent(query);
+  if (!engine) return `https://www.google.com/search?num=100&q=${q}`;
 
-  // Special: google uses region-specific domain
+  // Special: google uses region-specific domain + max results
   if (engineId === "google" && regionKey) {
     const R = REGIONS[regionKey];
-    if (R) return `https://www.${R.google}/search?q=${encodeURIComponent(query)}`;
+    if (R) return `https://www.${R.google}/search?num=100&q=${q}`;
   }
-  // Special: bing uses region cc param
+  if (engineId === "google") return `https://www.google.com/search?num=100&q=${q}`;
+
+  // Special: bing uses region cc param + max count
   if (engineId === "bing" && regionKey) {
     const R = REGIONS[regionKey];
-    if (R) return `https://www.bing.com/search?cc=${R.bing_loc}&q=${encodeURIComponent(query)}`;
+    if (R) return `https://www.bing.com/search?cc=${R.bing_loc}&count=50&q=${q}`;
   }
+  if (engineId === "bing") return `https://www.bing.com/search?count=50&q=${q}`;
+
   // Special: DDG uses region param
   if (engineId === "ddg" && regionKey) {
     const R = REGIONS[regionKey];
-    if (R) return `https://duckduckgo.com/?kl=${R.ddg_region}&q=${encodeURIComponent(query)}`;
+    if (R) return `https://duckduckgo.com/?kl=${R.ddg_region}&q=${q}`;
   }
 
-  return `${engine.baseUrl}${encodeURIComponent(query)}`;
+  return `${engine.baseUrl}${q}`;
 }
 
 // Get all engines by category

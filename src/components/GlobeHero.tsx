@@ -13,6 +13,7 @@ const MARKERS: COBEOptions['markers'] = [
   { location: [-33.4489, -70.6693], size: 0.05 }, // Chile
   { location: [-12.0464, -77.0428], size: 0.05 }, // Peru
   { location: [-0.1807,  -78.4678], size: 0.05 }, // Ecuador
+  { location: [18.4861,  -69.9312], size: 0.05 }, // Dominican Republic
 ];
 
 const ARCS: COBEOptions['arcs'] = [
@@ -24,6 +25,7 @@ const ARCS: COBEOptions['arcs'] = [
   { from: COLOMBIA, to: [-33.4489, -70.6693] },
   { from: COLOMBIA, to: [-12.0464, -77.0428] },
   { from: COLOMBIA, to: [-0.1807,  -78.4678] },
+  { from: COLOMBIA, to: [18.4861,  -69.9312] },
 ];
 
 interface GlobeHeroProps {
