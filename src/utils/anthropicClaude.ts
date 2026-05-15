@@ -39,15 +39,15 @@ export async function callAnthropicClaude(
 
   if (!text) throw new Error("Claude returned no text content");
 
-  // Find all candidate JSON arrays, pick the largest (most complete) one
-  const candidates = [...text.matchAll(/\[[\s\S]*?\]/g)].map(m => m[0]);
-  for (const candidate of candidates.sort((a, b) => b.length - a.length)) {
+  // Pick the longest candidate array first — Claude's final answer is usually the biggest block
+  const candidates = [...text.matchAll(/\[[\s\S]*?\]/g)]
+    .map(m => m[0])
+    .sort((a, b) => b.length - a.length);
+  for (const candidate of candidates) {
     try {
       const parsed = JSON.parse(candidate);
       if (Array.isArray(parsed)) return parsed;
-    } catch {
-      continue;
-    }
+    } catch { continue; }
   }
 
   throw new Error("No valid JSON array found in Claude response");

@@ -14,6 +14,16 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/anthropic/, ''),
       },
+      '/api/bing': {
+        target: 'https://api.bing.microsoft.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/bing/, ''),
+      },
+      '/api/brave': {
+        target: 'https://api.search.brave.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/brave/, ''),
+      },
     },
   },
   resolve: {

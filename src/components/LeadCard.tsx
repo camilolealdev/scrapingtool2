@@ -1,17 +1,23 @@
 import React from 'react';
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, MapPin } from "lucide-react";
 import { ScrapeResult } from '../types';
 
 interface LeadCardProps {
   lead: ScrapeResult;
+  onViewOnMap?: (lat: number, lng: number) => void;
 }
 
-export function LeadCard({ lead }: LeadCardProps) {
+export function LeadCard({ lead, onViewOnMap }: LeadCardProps) {
   return (
     <div className="bg-bg1 border border-b0 rounded-lg p-3 hover:border-b1 transition-colors">
       <div className="flex justify-between items-start mb-2">
         <h4 className="font-bold text-sm text-blue-brand">{lead.name}</h4>
         <div className="flex gap-2">
+          {lead.lat && lead.lng && onViewOnMap && (
+            <button onClick={() => onViewOnMap(lead.lat!, lead.lng!)} className="text-green-brand hover:scale-110 transition-transform" title="Ver en mapa">
+              <MapPin className="w-3.5 h-3.5" />
+            </button>
+          )}
           {lead.website && lead.website !== "none" && <a href={lead.website} target="_blank" className="text-cyan-brand hover:scale-110 transition-transform"><ExternalLink className="w-3.5 h-3.5" /></a>}
         </div>
       </div>

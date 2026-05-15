@@ -1,4 +1,5 @@
 import { Star, Search, Filter } from "lucide-react";
+import { CategoryPills } from './CategoryPills';
 
 interface Props {
   TEMPLATES: any;
@@ -48,25 +49,7 @@ export default function TemplateList({ TEMPLATES, activeCategory, setActiveCateg
   return (
     <>
       <div className="flex flex-col gap-2 mb-5">
-        <div className="flex flex-wrap gap-1.5">
-          {Object.entries(TEMPLATES).map(([k, c]: any) => {
-            const isActive = activeCategory === k;
-            return (
-              <button
-                key={k}
-                onClick={() => setActiveCategory(k)}
-                className={`flex items-center gap-1.5 px-2.5 py-[5px] rounded-lg border text-[10px] font-semibold tracking-wide transition-all duration-150 whitespace-nowrap
-                  ${isActive ? 'text-white' : 'bg-bg1 border-b0 text-t2 hover:text-white'}`}
-                style={isActive
-                  ? { background: `${c.color}cc`, borderColor: c.color, boxShadow: `0 0 10px ${c.color}50` }
-                  : {}}
-              >
-                <span className="text-[11px] leading-none">{c.icon}</span>
-                {c.name}
-              </button>
-            );
-          })}
-        </div>
+        <CategoryPills TEMPLATES={TEMPLATES} activeCategory={activeCategory} onSelect={setActiveCategory} />
         <div className="flex gap-2 bg-bgc border border-b0 p-1.5 rounded-xl w-full lg:w-auto">
           <div className="relative">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-t2" />
