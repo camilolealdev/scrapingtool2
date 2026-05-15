@@ -311,7 +311,7 @@ export default function App() {
             <div className="flex items-center gap-2 text-[10px] text-t2"><Search className="w-3 h-3" /> Russell Optimized</div>
             <div className="flex items-center gap-2 text-[10px] text-t2"><Database className="w-3 h-3" /> Export Ready</div>
           </div>
-          <p className="text-[9px] font-mono text-t2 opacity-50 uppercase tracking-[2px]">Use responsibly. Powered by Google AI Studio.</p>
+          <p className="text-[9px] font-mono text-t2 opacity-50 uppercase tracking-[2px]">Use responsibly. Powered by CCG Digital Studio.</p>
         </footer>
       </div>
 
