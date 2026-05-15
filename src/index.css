@@ -27,6 +27,46 @@
   --color-red-brand: #FF5252;
 }
 
+/* ── LIGHT MODE OVERRIDES ─────────────────────────────────────── */
+html.light {
+  --color-bg0: #f0f0ff;
+  --color-bg1: #ffffff;
+  --color-bg2: #e8e8fc;
+  --color-bg3: #ddddf5;
+  --color-bgc: #f5f5fe;
+  --color-bgh: #eaeaf8;
+  --color-b0:  #cccce6;
+  --color-b1:  #b0b0d8;
+  --color-t0:  #0c0c28;
+  --color-t1:  #3a3a6a;
+  --color-t2:  #7a7aa8;
+}
+
+html.light .leaflet-container {
+  background: #f0f0ff !important;
+}
+html.light .leaflet-tile {
+  filter: none;
+}
+html.light .leaflet-popup-content-wrapper,
+html.light .leaflet-popup-tip {
+  background: #ffffff;
+  color: #0c0c28;
+  border-color: #cccce6;
+}
+
+/* tc-q and qb: cyan unreadable on light bg → use blue */
+html.light .tc-q {
+  color: var(--color-blue-brand);
+  background: var(--color-bg2);
+  border-color: var(--color-b0);
+}
+html.light .qb {
+  color: var(--color-blue-brand);
+  background: var(--color-bg2);
+  border-color: var(--color-b0);
+}
+
 @layer base {
   body {
     @apply bg-bg0 text-t0 antialiased;
