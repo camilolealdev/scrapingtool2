@@ -64,9 +64,17 @@ export function ScraperTab({
   orModel, setOrModel
 }: ScraperTabProps) {
 
+  const ENV: Record<string, string> = {
+    VITE_GEMINI_API_KEY:      import.meta.env.VITE_GEMINI_API_KEY      || '',
+    VITE_ANTHROPIC_API_KEY:   import.meta.env.VITE_ANTHROPIC_API_KEY   || '',
+    VITE_OPENROUTER_API_KEY:  import.meta.env.VITE_OPENROUTER_API_KEY  || '',
+    VITE_NVIDIA_API_KEY:      import.meta.env.VITE_NVIDIA_API_KEY       || '',
+    VITE_GOOGLE_CS_API_KEY:   import.meta.env.VITE_GOOGLE_CS_API_KEY   || '',
+    VITE_GOOGLE_CS_CX:        import.meta.env.VITE_GOOGLE_CS_CX        || '',
+  };
   const getSavedKey = (key: string) => {
     if (typeof window === 'undefined') return '';
-    return localStorage.getItem(`osint_${key}`) || import.meta.env[key] || '';
+    return localStorage.getItem(`osint_${key}`) || ENV[key] || '';
   };
 
   const hasValidKey = () => {
