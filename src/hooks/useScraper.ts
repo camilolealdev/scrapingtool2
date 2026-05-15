@@ -104,55 +104,68 @@ export function useScraper(
       prompt = `Escanea profundamente: "${query}". Encuentra y lista todos los teléfonos de negocios. Devuelve objetos lead con 'name' y 'phone' o 'whatsapp'.`;
     }
 
-    try {
-      if (aiProvider === "gemini") {
-        addLog("📡 Consultando a Gemini con herramientas de búsqueda...");
-        const apiKey = getKey("VITE_GEMINI_API_KEY");
-        const ai = new GoogleGenAI({ apiKey });
-        const response = await ai.models.generateContent({
-          model: "gemini-2.0-flash",
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          config: {
-            systemInstruction: instructions,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  name: { type: Type.STRING },
-                  phone: { type: Type.STRING },
-                  email: { type: Type.STRING },
-                  whatsapp: { type: Type.STRING },
-                  website: { type: Type.STRING },
-                  instagram: { type: Type.STRING },
-                  address: { type: Type.STRING },
-                  lat: { type: Type.NUMBER },
-                  lng: { type: Type.NUMBER },
-                  notes: { type: Type.STRING },
-                },
-                required: ["name"]
-              }
-            },
-            tools: [{ googleSearch: {} }]
+    const runGemini = async () => {
+      addLog("📡 Consultando a Gemini con herramientas de búsqueda...");
+      const apiKey = getKey("VITE_GEMINI_API_KEY");
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        config: {
+          systemInstruction: instructions,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING }, phone: { type: Type.STRING },
+                email: { type: Type.STRING }, whatsapp: { type: Type.STRING },
+                website: { type: Type.STRING }, instagram: { type: Type.STRING },
+                address: { type: Type.STRING }, lat: { type: Type.NUMBER },
+                lng: { type: Type.NUMBER }, notes: { type: Type.STRING },
+              },
+              required: ["name"]
+            }
           },
-        });
-        const text = response.text;
-        if (text) {
-          const parsed = JSON.parse(text);
-          if (Array.isArray(parsed)) {
-            setScrapeResults(prev => [...prev, ...parsed]);
-            addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
-          }
-        }
-      } else if (aiProvider === "claude") {
-        addLog("🟣 Consultando Claude claude-sonnet-4-6 con búsqueda web...");
-        const apiKey = getKey("VITE_ANTHROPIC_API_KEY");
-        const parsed = await callAnthropicClaude(apiKey, prompt, instructions);
+          tools: [{ googleSearch: {} }]
+        },
+      });
+      const text = response.text;
+      if (text) {
+        const parsed = JSON.parse(text);
         if (Array.isArray(parsed)) {
           setScrapeResults(prev => [...prev, ...parsed]);
           addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
         }
+      }
+    };
+
+    const runClaude = async () => {
+      addLog("🟣 Consultando Claude claude-sonnet-4-6 con búsqueda web...");
+      const apiKey = getKey("VITE_ANTHROPIC_API_KEY");
+      const parsed = await callAnthropicClaude(apiKey, prompt, instructions);
+      if (Array.isArray(parsed)) {
+        setScrapeResults(prev => [...prev, ...parsed]);
+        addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
+      }
+    };
+
+    try {
+      if (aiProvider === "gemini") {
+        try {
+          await runGemini();
+        } catch (geminiErr: any) {
+          const is429 = geminiErr?.message?.includes("429") || geminiErr?.message?.includes("RESOURCE_EXHAUSTED") || geminiErr?.message?.includes("quota");
+          if (is429 && getKey("VITE_ANTHROPIC_API_KEY")) {
+            addLog("⚠️ Gemini cuota agotada — cambiando a Claude automáticamente...");
+            await runClaude();
+          } else {
+            throw geminiErr;
+          }
+        }
+      } else if (aiProvider === "claude") {
+        await runClaude();
       } else if (aiProvider === "openrouter") {
         addLog(`📡 Consultando OpenRouter (${orModel})...`);
         const apiKey = getKey("VITE_OPENROUTER_API_KEY");
