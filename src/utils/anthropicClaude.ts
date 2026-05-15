@@ -1,13 +1,9 @@
-const ANTHROPIC_BASE = import.meta.env.DEV
-  ? "/api/anthropic"
-  : "https://api.anthropic.com";
-
 export async function callAnthropicClaude(
   apiKey: string,
   prompt: string,
   systemInstruction: string
 ): Promise<any[]> {
-  const resp = await fetch(`${ANTHROPIC_BASE}/v1/messages`, {
+  const resp = await fetch('/api/anthropic', {
     method: "POST",
     headers: {
       "x-api-key": apiKey,

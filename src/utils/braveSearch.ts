@@ -1,7 +1,5 @@
 import type { ScrapeResult } from '../types/index';
 
-const BRAVE_BASE = import.meta.env.DEV ? '/api/brave' : 'https://api.search.brave.com';
-
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const PHONE_RE = /(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}/g;
 const WA_RE = /wa\.me\/(\d+)/;
@@ -14,7 +12,7 @@ export async function braveWebSearch(
   count = 10,
   country = 'CO'
 ): Promise<ScrapeResult[]> {
-  const url = `${BRAVE_BASE}/res/v1/web/search?q=${encodeURIComponent(query)}&count=${count}&country=${country}&search_lang=es&ui_lang=es`;
+  const url = `/api/brave?q=${encodeURIComponent(query)}&count=${count}&country=${country}&search_lang=es&ui_lang=es`;
   const resp = await fetch(url, {
     headers: {
       'X-Subscription-Token': apiKey,

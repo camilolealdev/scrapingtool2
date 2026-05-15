@@ -12,17 +12,17 @@ export default defineConfig({
       '/api/anthropic': {
         target: 'https://api.anthropic.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/anthropic/, ''),
+        rewrite: () => '/v1/messages',
       },
       '/api/bing': {
         target: 'https://api.bing.microsoft.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/bing/, ''),
+        rewrite: (path) => '/v7.0/search' + path.replace(/^\/api\/bing/, ''),
       },
       '/api/brave': {
         target: 'https://api.search.brave.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/brave/, ''),
+        rewrite: (path) => '/res/v1/web/search' + path.replace(/^\/api\/brave/, ''),
       },
     },
   },

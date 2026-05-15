@@ -1,7 +1,5 @@
 import type { ScrapeResult } from '../types/index';
 
-const BING_BASE = import.meta.env.DEV ? '/api/bing' : 'https://api.bing.microsoft.com';
-
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const PHONE_RE = /(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}/g;
 const WA_RE = /wa\.me\/(\d+)/;
@@ -14,7 +12,7 @@ export async function bingWebSearch(
   count = 10,
   market = 'es-CO'
 ): Promise<ScrapeResult[]> {
-  const url = `${BING_BASE}/v7.0/search?q=${encodeURIComponent(query)}&count=${count}&mkt=${market}&responseFilter=Webpages`;
+  const url = `/api/bing?q=${encodeURIComponent(query)}&count=${count}&mkt=${market}&responseFilter=Webpages`;
   const resp = await fetch(url, {
     headers: { 'Ocp-Apim-Subscription-Key': apiKey },
   });
