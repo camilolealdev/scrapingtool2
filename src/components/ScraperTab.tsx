@@ -28,17 +28,26 @@ interface ScraperTabProps {
   generatePythonScript: () => void;
   downloadPythonScript: () => void;
   autoStart: (query: string) => void;
-  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs";
-  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs") => void;
+  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude";
+  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude") => void;
   orModel: string;
   setOrModel: (v: string) => void;
 }
 
 const KEY_MAP = {
   gemini: 'VITE_GEMINI_API_KEY',
+  claude: 'VITE_ANTHROPIC_API_KEY',
   openrouter: 'VITE_OPENROUTER_API_KEY',
   nvidia: 'VITE_NVIDIA_API_KEY',
   'google-cs': 'VITE_GOOGLE_CS_API_KEY',
+};
+
+const PROVIDER_LABELS: Record<string, { label: string; badge: string; color: string }> = {
+  gemini:     { label: 'Gemini',     badge: '🔍 Web',    color: '#4285F4' },
+  claude:     { label: 'Claude',     badge: '🌐 Web',    color: '#D97757' },
+  openrouter: { label: 'OpenRouter', badge: '🔁 Multi',  color: '#7C3AED' },
+  nvidia:     { label: 'NVIDIA',     badge: '⚡ NIM',    color: '#76B900' },
+  'google-cs':{ label: 'Google CS',  badge: '🔎 CS',     color: '#EA4335' },
 };
 
 const CX_KEY = 'VITE_GOOGLE_CS_CX';
@@ -132,38 +141,47 @@ export function ScraperTab({
 
         {/* Provider selector */}
         <div className="bg-bg1/50 p-3 rounded-lg border border-b0">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-bold text-t2 uppercase tracking-widest">AI Provider</span>
-            <div className="flex gap-2">
-              {Object.entries(KEY_MAP).map(([id, key]) => {
-                const saved = getSavedKey(key);
-                const isActive = aiProvider === id;
-                return (
-                  <button
-                    key={id}
-                    className={`btn text-[10px] font-bold px-3 py-1 border transition-all ${isActive ? "bg-bg3 border-blue-brand text-blue-brand" : "bg-bg1 border-b0 text-t2 hover:text-t1"}`}
-                    onClick={() => setAiProvider(id as any)}
-                  >
-                    <span className={`w-2 h-2 rounded-full inline-block mr-1 ${saved ? "bg-green-brand" : "bg-red-brand/50"}`} />
-                    {id === 'google-cs' ? 'Google CS' : id === 'openrouter' ? 'OpenRouter' : id === 'nvidia' ? 'NVIDIA' : 'Gemini'}
-                  </button>
-                );
-              })}
-            </div>
+          <span className="text-[10px] font-bold text-t2 uppercase tracking-widest block mb-2">AI Provider</span>
+
+          {/* Provider buttons */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {Object.entries(KEY_MAP).map(([id, key]) => {
+              const saved = getSavedKey(key);
+              const isActive = aiProvider === id;
+              const meta = PROVIDER_LABELS[id];
+              return (
+                <button
+                  key={id}
+                  onClick={() => setAiProvider(id as any)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-all duration-150
+                    ${isActive ? 'text-white' : 'bg-bg1 border-b0 text-t2 hover:text-white'}`}
+                  style={isActive ? { background: `${meta.color}cc`, borderColor: meta.color, boxShadow: `0 0 10px ${meta.color}50` } : {}}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${saved ? 'bg-green-brand' : 'bg-red-brand/50'}`} />
+                  {meta.label}
+                  <span className={`text-[9px] px-1 py-0.5 rounded font-mono ${isActive ? 'bg-white/20' : 'bg-bg0/60 text-t2'}`}>{meta.badge}</span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Key inputs */}
-          {(aiProvider === 'gemini' || aiProvider === 'openrouter' || aiProvider === 'nvidia') && (
-            <div className="flex gap-2 mt-2">
+          {/* Key input for current provider */}
+          {aiProvider !== 'google-cs' && (
+            <div className="flex gap-2">
               <input
-                className="inp flex-1 text-[10px]"
-                placeholder={`Pega tu ${aiProvider === 'gemini' ? 'Gemini' : aiProvider === 'openrouter' ? 'OpenRouter' : 'NVIDIA'} API key...`}
-                defaultValue={getSavedKey(KEY_MAP[aiProvider])}
+                className="inp flex-1 text-[10px] font-mono"
+                placeholder={
+                  aiProvider === 'gemini'     ? 'AIza... (Google AI Studio)' :
+                  aiProvider === 'claude'     ? 'sk-ant-... (console.anthropic.com)' :
+                  aiProvider === 'openrouter' ? 'sk-or-... (openrouter.ai)' :
+                                               'nvapi-... (build.nvidia.com)'
+                }
+                defaultValue={getSavedKey(KEY_MAP[aiProvider as keyof typeof KEY_MAP])}
                 onChange={e => handleKeyChange(aiProvider, e.target.value)}
               />
               {hasValidKey() && (
                 <button
-                  className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px]"
+                  className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px] whitespace-nowrap"
                   onClick={() => { if (scrapeQuery.trim()) runAIScrape(scrapeQuery); }}
                   disabled={!scrapeQuery.trim() || scraping}
                 >
@@ -174,22 +192,22 @@ export function ScraperTab({
           )}
 
           {aiProvider === 'google-cs' && (
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2">
               <input
-                className="inp flex-1 text-[10px]"
+                className="inp flex-1 text-[10px] font-mono"
                 placeholder="Google CS API Key..."
                 defaultValue={getSavedKey(KEY_MAP['google-cs'])}
                 onChange={e => handleKeyChange('google-cs', e.target.value)}
               />
               <input
-                className="inp flex-1 text-[10px]"
+                className="inp flex-1 text-[10px] font-mono"
                 placeholder="CX ID..."
                 defaultValue={getSavedKey(CX_KEY)}
                 onChange={e => handleCxChange(e.target.value)}
               />
               {hasValidKey() && (
                 <button
-                  className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px]"
+                  className="btn bg-green-brand/20 border border-green-brand/30 text-green-brand text-[10px] whitespace-nowrap"
                   onClick={() => { if (scrapeQuery.trim()) runAIScrape(scrapeQuery); }}
                   disabled={!scrapeQuery.trim() || scraping}
                 >
@@ -201,16 +219,20 @@ export function ScraperTab({
 
           {aiProvider === 'openrouter' && (
             <div className="flex gap-2 mt-2">
-              <select
-                className="inp text-[10px] flex-1"
-                value={orModel}
-                onChange={e => setOrModel(e.target.value)}
-              >
+              <select className="inp text-[10px] flex-1" value={orModel} onChange={e => setOrModel(e.target.value)}>
                 <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
                 <option value="openai/gpt-4o">GPT-4o</option>
                 <option value="meta-llama/llama-3.1-405b">Llama 3.1 405B</option>
               </select>
             </div>
+          )}
+
+          {/* Info badge for providers with real web search */}
+          {(aiProvider === 'gemini' || aiProvider === 'claude') && (
+            <p className="text-[9px] text-green-brand mt-2 flex items-center gap-1">
+              <span>✓</span>
+              {aiProvider === 'gemini' ? 'Gemini 2.0 Flash — búsqueda web en vivo vía Google Search' : 'Claude claude-sonnet-4-6 — búsqueda web en vivo vía Anthropic Web Search'}
+            </p>
           )}
         </div>
 
