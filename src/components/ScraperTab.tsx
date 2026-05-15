@@ -1,4 +1,5 @@
 import React from 'react';
+import { getStoredKey } from '../utils/envKeys';
 import { Bot, Terminal, Instagram, Mail, Zap, MapPin, Download, Search, FileText, Database } from "lucide-react";
 import { ScrapeResult, LogEntry } from '../types';
 import { LeadCard } from './LeadCard';
@@ -28,8 +29,9 @@ interface ScraperTabProps {
   generatePythonScript: () => void;
   downloadPythonScript: () => void;
   autoStart: (query: string) => void;
-  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude";
-  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude") => void;
+  setMapParams: (v: { center: [number, number]; zoom: number }) => void;
+  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave";
+  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave") => void;
   orModel: string;
   setOrModel: (v: string) => void;
 }
@@ -40,14 +42,18 @@ const KEY_MAP = {
   openrouter: 'VITE_OPENROUTER_API_KEY',
   nvidia: 'VITE_NVIDIA_API_KEY',
   'google-cs': 'VITE_GOOGLE_CS_API_KEY',
+  bing: 'VITE_BING_API_KEY',
+  brave: 'VITE_BRAVE_API_KEY',
 };
 
-const PROVIDER_LABELS: Record<string, { label: string; badge: string; color: string }> = {
-  gemini:     { label: 'Gemini',     badge: '🔍 Web',    color: '#4285F4' },
-  claude:     { label: 'Claude',     badge: '🌐 Web',    color: '#D97757' },
-  openrouter: { label: 'OpenRouter', badge: '🔁 Multi',  color: '#7C3AED' },
-  nvidia:     { label: 'NVIDIA',     badge: '⚡ NIM',    color: '#76B900' },
-  'google-cs':{ label: 'Google CS',  badge: '🔎 CS',     color: '#EA4335' },
+const PROVIDER_LABELS: Record<string, { label: string; badge: string; color: string; placeholder: string }> = {
+  gemini:     { label: 'Gemini',     badge: '🔍 Web',   color: '#4285F4', placeholder: 'AIza... (aistudio.google.com)' },
+  claude:     { label: 'Claude',     badge: '🌐 Web',   color: '#D97757', placeholder: 'sk-ant-... (console.anthropic.com)' },
+  openrouter: { label: 'OpenRouter', badge: '🔁 Multi', color: '#7C3AED', placeholder: 'sk-or-... (openrouter.ai)' },
+  nvidia:     { label: 'NVIDIA',     badge: '⚡ NIM',   color: '#76B900', placeholder: 'nvapi-... (build.nvidia.com)' },
+  'google-cs':{ label: 'Google CS',  badge: '🔎 CS',    color: '#EA4335', placeholder: 'API Key...' },
+  bing:       { label: 'Bing',       badge: '🔷 Search',color: '#0078D4', placeholder: 'Bing Search API key...' },
+  brave:      { label: 'Brave',      badge: '🦁 Search',color: '#FB542B', placeholder: 'BSA... (brave.com/search/api)' },
 };
 
 const CX_KEY = 'VITE_GOOGLE_CS_CX';
@@ -59,23 +65,12 @@ export function ScraperTab({
   sortedAndFilteredLeads, setTab, exportLeadsCSV, scrapeLog,
   exportScrapeLog, allHistoryLogs, exportAllLogs,
   generatePythonScript, downloadPythonScript,
-  autoStart,
+  autoStart, setMapParams,
   aiProvider, setAiProvider,
   orModel, setOrModel
 }: ScraperTabProps) {
 
-  const ENV: Record<string, string> = {
-    VITE_GEMINI_API_KEY:      import.meta.env.VITE_GEMINI_API_KEY      || '',
-    VITE_ANTHROPIC_API_KEY:   import.meta.env.VITE_ANTHROPIC_API_KEY   || '',
-    VITE_OPENROUTER_API_KEY:  import.meta.env.VITE_OPENROUTER_API_KEY  || '',
-    VITE_NVIDIA_API_KEY:      import.meta.env.VITE_NVIDIA_API_KEY       || '',
-    VITE_GOOGLE_CS_API_KEY:   import.meta.env.VITE_GOOGLE_CS_API_KEY   || '',
-    VITE_GOOGLE_CS_CX:        import.meta.env.VITE_GOOGLE_CS_CX        || '',
-  };
-  const getSavedKey = (key: string) => {
-    if (typeof window === 'undefined') return '';
-    return localStorage.getItem(`osint_${key}`) || ENV[key] || '';
-  };
+  const getSavedKey = getStoredKey;
 
   const hasValidKey = () => {
     const key = KEY_MAP[aiProvider];
@@ -178,12 +173,7 @@ export function ScraperTab({
             <div className="flex gap-2">
               <input
                 className="inp flex-1 text-[10px] font-mono"
-                placeholder={
-                  aiProvider === 'gemini'     ? 'AIza... (Google AI Studio)' :
-                  aiProvider === 'claude'     ? 'sk-ant-... (console.anthropic.com)' :
-                  aiProvider === 'openrouter' ? 'sk-or-... (openrouter.ai)' :
-                                               'nvapi-... (build.nvidia.com)'
-                }
+                placeholder={PROVIDER_LABELS[aiProvider]?.placeholder ?? 'API Key...'}
                 defaultValue={getSavedKey(KEY_MAP[aiProvider as keyof typeof KEY_MAP])}
                 onChange={e => handleKeyChange(aiProvider, e.target.value)}
               />
@@ -240,6 +230,12 @@ export function ScraperTab({
             <p className="text-[9px] text-green-brand mt-2 flex items-center gap-1">
               <span>✓</span>
               {aiProvider === 'gemini' ? 'Gemini 2.0 Flash — búsqueda web en vivo vía Google Search' : 'Claude claude-sonnet-4-6 — búsqueda web en vivo vía Anthropic Web Search'}
+            </p>
+          )}
+          {(aiProvider === 'bing' || aiProvider === 'brave') && (
+            <p className="text-[9px] text-blue-400 mt-2 flex items-center gap-1">
+              <span>✓</span>
+              {aiProvider === 'bing' ? 'Bing Web Search API — resultados reales de Bing, extrae contactos de snippets' : 'Brave Search API — índice independiente, encuentra páginas que Google/Bing no muestran'}
             </p>
           )}
         </div>
@@ -323,7 +319,11 @@ export function ScraperTab({
 
           <div className="flex-1 space-y-3">
             {sortedAndFilteredLeads.map((lead, idx) => (
-              <LeadCard key={idx} lead={lead} />
+              <LeadCard
+                key={idx}
+                lead={lead}
+                onViewOnMap={lead.lat && lead.lng ? (lat, lng) => { setMapParams({ center: [lat, lng], zoom: 15 }); setTab("map"); } : undefined}
+              />
             ))}
           </div>
         </div>

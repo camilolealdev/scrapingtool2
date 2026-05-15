@@ -6,6 +6,9 @@ import { callOpenRouter } from '../utils/openRouter';
 import { callNVIDIANIM } from '../utils/nvidiaNIM';
 import { googleCustomSearch } from '../utils/googleCS';
 import { callAnthropicClaude } from '../utils/anthropicClaude';
+import { bingWebSearch } from '../utils/bingSearch';
+import { braveWebSearch } from '../utils/braveSearch';
+import { getStoredKey, persistEnvKeys } from '../utils/envKeys';
 
 export function useScraper(
   niche: string, city: string, zone: string, year: number,
@@ -27,27 +30,11 @@ export function useScraper(
   const [mapParams, setMapParams] = useState<MapParams>({ center: [4.5709, -74.2973], zoom: 6 });
   const [locSearch, setLocSearch] = useState("");
 
-  const ENV: Record<string, string> = {
-    VITE_GEMINI_API_KEY:      import.meta.env.VITE_GEMINI_API_KEY      || '',
-    VITE_ANTHROPIC_API_KEY:   import.meta.env.VITE_ANTHROPIC_API_KEY   || '',
-    VITE_OPENROUTER_API_KEY:  import.meta.env.VITE_OPENROUTER_API_KEY  || '',
-    VITE_NVIDIA_API_KEY:      import.meta.env.VITE_NVIDIA_API_KEY       || '',
-    VITE_GOOGLE_CS_API_KEY:   import.meta.env.VITE_GOOGLE_CS_API_KEY   || '',
-    VITE_GOOGLE_CS_CX:        import.meta.env.VITE_GOOGLE_CS_CX        || '',
-  };
-  const getKey = (key: string) => localStorage.getItem(`osint_${key}`) || ENV[key] || '';
+  const getKey = getStoredKey;
 
-  // Persist .env.local keys to localStorage once on mount so they're always available
-  useEffect(() => {
-    Object.entries(ENV).forEach(([key, val]) => {
-      if (val && !localStorage.getItem(`osint_${key}`)) {
-        localStorage.setItem(`osint_${key}`, val);
-      }
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => { persistEnvKeys(); }, []);
 
-  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude">(() => {
+  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave">(() => {
     if (getKey("VITE_GEMINI_API_KEY")) return "gemini";
     if (getKey("VITE_ANTHROPIC_API_KEY")) return "claude";
     if (getKey("VITE_OPENROUTER_API_KEY")) return "openrouter";
@@ -71,6 +58,12 @@ export function useScraper(
     setShowErrors(false);
     return true;
   }, [niche, city, zone, showToast, setShowErrors]);
+
+  const addLeads = useCallback((parsed: any[]) => {
+    if (!Array.isArray(parsed) || parsed.length === 0) return;
+    setScrapeResults(prev => [...prev, ...parsed]);
+    addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
+  }, [addLog]);
 
   const searchLocation = async (q: string) => {
     if (!q.trim() || geocoding) return;
@@ -100,19 +93,38 @@ export function useScraper(
     setScraping(true);
     addLog(`🤖 ${aiProvider.toUpperCase()} - ${mode.toUpperCase()} - Iniciando: ${query.slice(0, 50)}...`);
 
-    let instructions = "Eres un experto en inteligencia de fuentes abiertas (OSINT) y prospección B2B. Tu objetivo es encontrar y extraer leads de negocios reales basándote en la búsqueda o URL solicitada. Importante: Para las coordenadas (lat, lng), intenta estimarlas basándote en la dirección si no las encuentras explícitamente. Debes devolver una lista estructurada en JSON.";
-    let prompt = `Extrae todos los leads de negocios que encuentres para esta entrada: "${query}". Para cada lead necesito: nombre, teléfono, email, whatsapp, sitio web, instagram, dirección, latitud, longitud y notas relevantes sobre el estado del negocio. Devuelve un array JSON.`;
+    let instructions = "Eres un agente OSINT profesional de generación de leads B2B. Tu ÚNICA fuente de información es la búsqueda web en tiempo real. PROHIBIDO inventar negocios, teléfonos, emails o direcciones. Si no encuentras un negocio mediante búsqueda real, no lo incluyas. Cada lead DEBE provenir de una fuente web verificable. Incluye siempre la URL fuente en el campo notes.";
+    let prompt = `USA TU HERRAMIENTA DE BÚSQUEDA WEB AHORA para buscar: "${query}"\n\nBusca también variaciones: "${query} contacto teléfono", "${query} email whatsapp", "${query} dirección"\n\nPara cada negocio REAL encontrado en los resultados de búsqueda, extrae:\n- name: nombre exacto del negocio\n- phone: teléfono exacto como aparece\n- email: email exacto\n- whatsapp: enlace wa.me o número\n- website: URL exacta\n- instagram: @handle\n- address: dirección completa\n- lat: latitud (estima si conoces la ciudad)\n- lng: longitud (estima si conoces la ciudad)\n- notes: URL fuente + descripción breve\n\nSOLO negocios VERIFICADOS via búsqueda web real. NO inventes datos. Devuelve SOLO un array JSON.`;
 
     if (mode === "instagram") {
-      instructions = "Eres un experto en OSINT de redes sociales. Tu tarea es analizar perfiles de Instagram y extraer información de contacto y detalles del negocio. Debes devolver JSON.";
-      prompt = `Analiza este perfil o búsqueda de Instagram: "${query}". Extrae: nombre del negocio/cuenta, biografía, email, teléfono, ciudad, sitio web y cualquier dato de contacto disponible.`;
+      instructions = "Eres un agente OSINT experto en redes sociales. USA TU BÚSQUEDA WEB para encontrar perfiles reales de Instagram y sus datos de contacto. NUNCA inventes datos.";
+      prompt = `BUSCA AHORA en Google e Instagram: "${query}"\n\nBusca: site:instagram.com "${query}" email, site:instagram.com "${query}" "wa.me"\n\nPara cada perfil REAL encontrado extrae: name, email, phone, website, instagram (URL del perfil), notes (URL fuente). Devuelve array JSON.`;
     } else if (mode === "emails") {
-      instructions = "Eres un recolector de emails experto. Busca profundamente en el contenido de la web o búsqueda proporcionada y extrae todas las direcciones de correo electrónico relacionadas con negocios.";
-      prompt = `Escanea profundamente: "${query}". Encuentra y lista todos los emails de negocios. Devuelve objetos lead con 'name' y 'email'.`;
+      instructions = "Eres un extractor OSINT de emails. USA TU BÚSQUEDA WEB para encontrar emails reales. NUNCA inventes emails.";
+      prompt = `BUSCA AHORA: "${query}" "@gmail" OR "@hotmail" OR "email"\n\nTambién busca: "${query}" filetype:pdf "@"\n\nExtrae todos los emails REALES encontrados. Para cada uno: name, email, website, notes (URL fuente). Devuelve array JSON.`;
     } else if (mode === "phones") {
-      instructions = "Eres un recolector de teléfonos experto. Busca profundamente y extrae todos los números de teléfono y WhatsApp relacionados con negocios.";
-      prompt = `Escanea profundamente: "${query}". Encuentra y lista todos los teléfonos de negocios. Devuelve objetos lead con 'name' y 'phone' o 'whatsapp'.`;
+      instructions = "Eres un extractor OSINT de teléfonos. USA TU BÚSQUEDA WEB para encontrar teléfonos reales. NUNCA inventes números.";
+      prompt = `BUSCA AHORA: "${query}" "teléfono" OR "celular" OR "wa.me" OR "whatsapp"\n\nExtrae todos los teléfonos REALES encontrados. Para cada uno: name, phone, whatsapp, notes (URL fuente). Devuelve array JSON.`;
     }
+
+    const geocodeNewLeads = async (leads: ScrapeResult[]): Promise<ScrapeResult[]> => {
+      const needsGeo = leads.filter(l => l.address && !l.lat && !l.lng);
+      if (!needsGeo.length) return leads;
+      addLog(`📍 Geocodificando ${needsGeo.length} leads con dirección...`);
+      const result = [...leads];
+      for (let i = 0; i < result.length; i++) {
+        const lead = result[i];
+        if (!lead.address || lead.lat || lead.lng) continue;
+        try {
+          const q = encodeURIComponent(`${lead.address}, ${city}`);
+          const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`);
+          const data = await r.json();
+          if (data[0]) result[i] = { ...lead, lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+          await new Promise(res => setTimeout(res, 550));
+        } catch {}
+      }
+      return result;
+    };
 
     const runGemini = async () => {
       addLog("📡 Consultando a Gemini con herramientas de búsqueda...");
@@ -142,23 +154,15 @@ export function useScraper(
         },
       });
       const text = response.text;
-      if (text) {
-        const parsed = JSON.parse(text);
-        if (Array.isArray(parsed)) {
-          setScrapeResults(prev => [...prev, ...parsed]);
-          addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
-        }
-      }
+      if (text) { const geocoded = await geocodeNewLeads(JSON.parse(text)); addLeads(geocoded); }
     };
 
     const runClaude = async () => {
       addLog("🟣 Consultando Claude claude-sonnet-4-6 con búsqueda web...");
       const apiKey = getKey("VITE_ANTHROPIC_API_KEY");
       const parsed = await callAnthropicClaude(apiKey, prompt, instructions);
-      if (Array.isArray(parsed)) {
-        setScrapeResults(prev => [...prev, ...parsed]);
-        addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
-      }
+      const geocoded = await geocodeNewLeads(parsed);
+      addLeads(geocoded);
     };
 
     try {
@@ -179,19 +183,11 @@ export function useScraper(
       } else if (aiProvider === "openrouter") {
         addLog(`📡 Consultando OpenRouter (${orModel})...`);
         const apiKey = getKey("VITE_OPENROUTER_API_KEY");
-        const parsed = await callOpenRouter(apiKey, orModel, prompt, instructions);
-        if (Array.isArray(parsed)) {
-          setScrapeResults(prev => [...prev, ...parsed]);
-          addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
-        }
+        addLeads(await callOpenRouter(apiKey, orModel, prompt, instructions));
       } else if (aiProvider === "nvidia") {
         addLog("📡 Consultando a NVIDIA NIM...");
         const apiKey = getKey("VITE_NVIDIA_API_KEY");
-        const parsed = await callNVIDIANIM(apiKey, "nvidia/nemotron-4-340b-instruct", `${instructions}\n\n${prompt}`);
-        if (Array.isArray(parsed)) {
-          setScrapeResults(prev => [...prev, ...parsed]);
-          addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
-        }
+        addLeads(await callNVIDIANIM(apiKey, "nvidia/nemotron-4-340b-instruct", `${instructions}\n\n${prompt}`));
       } else if (aiProvider === "google-cs") {
         addLog("🔍 Google Custom Search...");
         const csApiKey = getKey("VITE_GOOGLE_CS_API_KEY");
@@ -232,8 +228,9 @@ export function useScraper(
               const text = response.text;
               if (text) {
                 const parsed = JSON.parse(text);
-                if (Array.isArray(parsed)) {
-                  setScrapeResults(prev => [...prev, ...parsed]);
+                if (Array.isArray(parsed) && parsed.length) {
+                  const geocoded = await geocodeNewLeads(parsed);
+                  addLeads(geocoded);
                 }
               }
           } catch (e: any) {
@@ -241,13 +238,29 @@ export function useScraper(
           }
         }
         addLog(`✅ Procesadas ${results.length} URLs.`);
+      } else if (aiProvider === "bing") {
+        addLog("🔷 Consultando Bing Search API...");
+        const bingKey = getKey("VITE_BING_API_KEY");
+        if (!bingKey) throw new Error("Bing API key no configurada");
+        const mkt = R?.lang === "pt" ? "pt-BR" : `es-${(R?.bing_loc || "CO").toUpperCase()}`;
+        const bingResults = await bingWebSearch(bingKey, query, 10, mkt);
+        const bingGeocoded = await geocodeNewLeads(bingResults);
+        addLeads(bingGeocoded);
+      } else if (aiProvider === "brave") {
+        addLog("🦁 Consultando Brave Search API...");
+        const braveKey = getKey("VITE_BRAVE_API_KEY");
+        if (!braveKey) throw new Error("Brave API key no configurada");
+        const country = (R?.bing_loc || "CO").toUpperCase();
+        const braveResults = await braveWebSearch(braveKey, query, 10, country);
+        const braveGeocoded = await geocodeNewLeads(braveResults);
+        addLeads(braveGeocoded);
       }
     } catch (err: any) {
       addLog(`❌ Error: ${err.message}`);
     } finally {
       setScraping(false);
     }
-  }, [aiProvider, scraping, orModel, checkInputs, addLog]);
+  }, [aiProvider, scraping, orModel, checkInputs, addLog, addLeads, city, R]);
 
   // Auto-start scrape when provider is ready and query is valid
   const autoStart = useCallback((query: string) => {
@@ -257,7 +270,9 @@ export function useScraper(
       (aiProvider === "claude" && getKey("VITE_ANTHROPIC_API_KEY")) ||
       (aiProvider === "openrouter" && getKey("VITE_OPENROUTER_API_KEY")) ||
       (aiProvider === "nvidia" && getKey("VITE_NVIDIA_API_KEY")) ||
-      (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX"));
+      (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX")) ||
+      (aiProvider === "bing" && getKey("VITE_BING_API_KEY")) ||
+      (aiProvider === "brave" && getKey("VITE_BRAVE_API_KEY"));
     if (hasKey) {
       addLog(`🚀 Auto-iniciando con ${aiProvider.toUpperCase()}...`);
       runAIScrape(query);

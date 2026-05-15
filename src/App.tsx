@@ -273,6 +273,7 @@ export default function App() {
                   autoStart={autoStart}
                   aiProvider={aiProvider} setAiProvider={setAiProvider}
                   orModel={orModel} setOrModel={setOrModel}
+                  setMapParams={setMapParams}
                 />
               </motion.div>
             )}
