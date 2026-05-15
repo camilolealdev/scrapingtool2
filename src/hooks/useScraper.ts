@@ -5,6 +5,7 @@ import { fillTemplate } from '../utils/dorkBuilder';
 import { callOpenRouter } from '../utils/openRouter';
 import { callNVIDIANIM } from '../utils/nvidiaNIM';
 import { googleCustomSearch } from '../utils/googleCS';
+import { callAnthropicClaude } from '../utils/anthropicClaude';
 
 export function useScraper(
   niche: string, city: string, zone: string, year: number,
@@ -28,8 +29,9 @@ export function useScraper(
 
   const getKey = (key: string) => localStorage.getItem(`osint_${key}`) || import.meta.env[key] || '';
 
-  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs">(() => {
+  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude">(() => {
     if (getKey("VITE_GEMINI_API_KEY")) return "gemini";
+    if (getKey("VITE_ANTHROPIC_API_KEY")) return "claude";
     if (getKey("VITE_OPENROUTER_API_KEY")) return "openrouter";
     if (getKey("VITE_NVIDIA_API_KEY")) return "nvidia";
     if (getKey("VITE_GOOGLE_CS_API_KEY")) return "google-cs";
@@ -135,6 +137,14 @@ export function useScraper(
             addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
           }
         }
+      } else if (aiProvider === "claude") {
+        addLog("🟣 Consultando Claude claude-sonnet-4-6 con búsqueda web...");
+        const apiKey = getKey("VITE_ANTHROPIC_API_KEY");
+        const parsed = await callAnthropicClaude(apiKey, prompt, instructions);
+        if (Array.isArray(parsed)) {
+          setScrapeResults(prev => [...prev, ...parsed]);
+          addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
+        }
       } else if (aiProvider === "openrouter") {
         addLog(`📡 Consultando OpenRouter (${orModel})...`);
         const apiKey = getKey("VITE_OPENROUTER_API_KEY");
@@ -213,6 +223,7 @@ export function useScraper(
     if (!query.trim() || scraping) return;
     const hasKey =
       (aiProvider === "gemini" && getKey("VITE_GEMINI_API_KEY")) ||
+      (aiProvider === "claude" && getKey("VITE_ANTHROPIC_API_KEY")) ||
       (aiProvider === "openrouter" && getKey("VITE_OPENROUTER_API_KEY")) ||
       (aiProvider === "nvidia" && getKey("VITE_NVIDIA_API_KEY")) ||
       (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX"));
