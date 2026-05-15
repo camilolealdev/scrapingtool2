@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import type { ScrapeResult, LogEntry, SortConfig, MapParams, QueryResult } from '../types';
 import { fillTemplate } from '../utils/dorkBuilder';
@@ -36,6 +36,16 @@ export function useScraper(
     VITE_GOOGLE_CS_CX:        import.meta.env.VITE_GOOGLE_CS_CX        || '',
   };
   const getKey = (key: string) => localStorage.getItem(`osint_${key}`) || ENV[key] || '';
+
+  // Persist .env.local keys to localStorage once on mount so they're always available
+  useEffect(() => {
+    Object.entries(ENV).forEach(([key, val]) => {
+      if (val && !localStorage.getItem(`osint_${key}`)) {
+        localStorage.setItem(`osint_${key}`, val);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude">(() => {
     if (getKey("VITE_GEMINI_API_KEY")) return "gemini";
