@@ -1,16 +1,19 @@
+const ANTHROPIC_BASE = import.meta.env.DEV
+  ? "/api/anthropic"
+  : "https://api.anthropic.com";
+
 export async function callAnthropicClaude(
   apiKey: string,
   prompt: string,
   systemInstruction: string
 ): Promise<any[]> {
-  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+  const resp = await fetch(`${ANTHROPIC_BASE}/v1/messages`, {
     method: "POST",
     headers: {
       "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
       "anthropic-beta": "web-search-2025-03-05",
       "content-type": "application/json",
-      "anthropic-dangerous-allow-browser": "true",
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
