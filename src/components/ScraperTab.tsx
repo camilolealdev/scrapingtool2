@@ -30,8 +30,8 @@ interface ScraperTabProps {
   downloadPythonScript: () => void;
   autoStart: (query: string) => void;
   setMapParams: (v: { center: [number, number]; zoom: number }) => void;
-  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave";
-  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave") => void;
+  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave" | "firecrawl";
+  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave" | "firecrawl") => void;
   orModel: string;
   setOrModel: (v: string) => void;
 }
@@ -44,6 +44,7 @@ const KEY_MAP = {
   'google-cs': 'VITE_GOOGLE_CS_API_KEY',
   bing: 'VITE_BING_API_KEY',
   brave: 'VITE_BRAVE_API_KEY',
+  firecrawl: 'VITE_FIRECRAWL_API_KEY',
 };
 
 const PROVIDER_LABELS: Record<string, { label: string; badge: string; color: string; placeholder: string }> = {
@@ -53,7 +54,8 @@ const PROVIDER_LABELS: Record<string, { label: string; badge: string; color: str
   nvidia:     { label: 'NVIDIA',     badge: '⚡ NIM',   color: '#76B900', placeholder: 'nvapi-... (build.nvidia.com)' },
   'google-cs':{ label: 'Google CS',  badge: '🔎 CS',    color: '#EA4335', placeholder: 'API Key...' },
   bing:       { label: 'Bing',       badge: '🔷 Search',color: '#0078D4', placeholder: 'Bing Search API key...' },
-  brave:      { label: 'Brave',      badge: '🦁 Search',color: '#FB542B', placeholder: 'BSA... (brave.com/search/api)' },
+  brave:      { label: 'Brave',      badge: '🦁 Search',  color: '#FB542B', placeholder: 'BSA... (brave.com/search/api)' },
+  firecrawl:  { label: 'Firecrawl', badge: '🔥 Scrape',  color: '#F97316', placeholder: 'fc-... (firecrawl.dev)' },
 };
 
 const CX_KEY = 'VITE_GOOGLE_CS_CX';
@@ -295,6 +297,12 @@ export function ScraperTab({
             <p className="text-[9px] text-blue-400 mt-2 flex items-center gap-1">
               <span>✓</span>
               {aiProvider === 'bing' ? 'Bing Web Search API — resultados reales de Bing, extrae contactos de snippets' : 'Brave Search API — índice independiente, encuentra páginas que Google/Bing no muestran'}
+            </p>
+          )}
+          {aiProvider === 'firecrawl' && (
+            <p className="text-[9px] text-orange-400 mt-2 flex items-center gap-1">
+              <span>✓</span>
+              Firecrawl — busca en la web Y scrapea el contenido completo de cada página en un solo paso
             </p>
           )}
         </div>

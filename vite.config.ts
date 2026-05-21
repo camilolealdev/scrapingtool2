@@ -24,6 +24,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => '/res/v1/web/search' + path.replace(/^\/api\/brave/, ''),
       },
+      '/api/firecrawl': {
+        target: 'https://api.firecrawl.dev',
+        changeOrigin: true,
+        rewrite: () => '/v1/search',
+      },
     },
   },
   resolve: {
