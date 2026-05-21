@@ -8,6 +8,7 @@ import { googleCustomSearch } from '../utils/googleCS';
 import { callAnthropicClaude } from '../utils/anthropicClaude';
 import { bingWebSearch } from '../utils/bingSearch';
 import { braveWebSearch } from '../utils/braveSearch';
+import { firecrawlSearch } from '../utils/firecrawlClient';
 import { getStoredKey, persistEnvKeys } from '../utils/envKeys';
 
 export function useScraper(
@@ -34,12 +35,13 @@ export function useScraper(
 
   useEffect(() => { persistEnvKeys(); }, []);
 
-  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave">(() => {
+  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave" | "firecrawl">(() => {
     if (getKey("VITE_GEMINI_API_KEY")) return "gemini";
     if (getKey("VITE_ANTHROPIC_API_KEY")) return "claude";
     if (getKey("VITE_OPENROUTER_API_KEY")) return "openrouter";
     if (getKey("VITE_NVIDIA_API_KEY")) return "nvidia";
     if (getKey("VITE_GOOGLE_CS_API_KEY")) return "google-cs";
+    if (getKey("VITE_FIRECRAWL_API_KEY")) return "firecrawl";
     return "gemini";
   });
   const [orModel, setOrModel] = useState("anthropic/claude-3.5-sonnet");
@@ -254,6 +256,14 @@ export function useScraper(
         const braveResults = await braveWebSearch(braveKey, query, 10, country);
         const braveGeocoded = await geocodeNewLeads(braveResults);
         addLeads(braveGeocoded);
+      } else if (aiProvider === "firecrawl") {
+        addLog("🔥 Firecrawl — Search + Scrape en tiempo real...");
+        const fcKey = getKey("VITE_FIRECRAWL_API_KEY");
+        if (!fcKey) throw new Error("Firecrawl API key no configurada");
+        const fcResults = await firecrawlSearch(fcKey, query, 10);
+        addLog(`📄 Firecrawl retornó ${fcResults.length} páginas scrapeadas`);
+        const fcGeocoded = await geocodeNewLeads(fcResults);
+        addLeads(fcGeocoded);
       }
     } catch (err: any) {
       addLog(`❌ Error: ${err.message}`);
@@ -272,7 +282,8 @@ export function useScraper(
       (aiProvider === "nvidia" && getKey("VITE_NVIDIA_API_KEY")) ||
       (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX")) ||
       (aiProvider === "bing" && getKey("VITE_BING_API_KEY")) ||
-      (aiProvider === "brave" && getKey("VITE_BRAVE_API_KEY"));
+      (aiProvider === "brave" && getKey("VITE_BRAVE_API_KEY")) ||
+      (aiProvider === "firecrawl" && getKey("VITE_FIRECRAWL_API_KEY"));
     if (hasKey) {
       addLog(`🚀 Auto-iniciando con ${aiProvider.toUpperCase()}...`);
       runAIScrape(query);

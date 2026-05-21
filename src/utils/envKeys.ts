@@ -4,9 +4,10 @@ export const ENV: Record<string, string> = {
   VITE_OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY || '',
   VITE_NVIDIA_API_KEY:     import.meta.env.VITE_NVIDIA_API_KEY      || '',
   VITE_GOOGLE_CS_API_KEY:  import.meta.env.VITE_GOOGLE_CS_API_KEY  || '',
-  VITE_GOOGLE_CS_CX:       import.meta.env.VITE_GOOGLE_CS_CX       || '',
-  VITE_BING_API_KEY:       import.meta.env.VITE_BING_API_KEY       || '',
-  VITE_BRAVE_API_KEY:      import.meta.env.VITE_BRAVE_API_KEY      || '',
+  VITE_GOOGLE_CS_CX:       import.meta.env.VITE_GOOGLE_CS_CX       || '953339e93c741489b',
+  VITE_BING_API_KEY:        import.meta.env.VITE_BING_API_KEY        || '',
+  VITE_BRAVE_API_KEY:       import.meta.env.VITE_BRAVE_API_KEY       || '',
+  VITE_FIRECRAWL_API_KEY:   import.meta.env.VITE_FIRECRAWL_API_KEY   || '',
 };
 
 export const getStoredKey = (key: string): string =>
