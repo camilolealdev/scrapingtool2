@@ -10,6 +10,7 @@ import { bingWebSearch } from '../utils/bingSearch';
 import { braveWebSearch } from '../utils/braveSearch';
 import { firecrawlSearch } from '../utils/firecrawlClient';
 import { getStoredKey, persistEnvKeys } from '../utils/envKeys';
+import { createSession, closeSession, insertLeads, insertLog, insertError } from '../lib/db';
 
 export function useScraper(
   niche: string, city: string, zone: string, year: number,
@@ -32,6 +33,8 @@ export function useScraper(
   const [locSearch, setLocSearch] = useState("");
 
   const getKey = getStoredKey;
+  const sessionIdRef = useRef<string | null>(null);
+  const sessionLeadsCountRef = useRef(0);
 
   useEffect(() => { persistEnvKeys(); }, []);
 
@@ -47,8 +50,9 @@ export function useScraper(
   const [orModel, setOrModel] = useState("anthropic/claude-3.5-sonnet");
   const [keysLoaded, setKeysLoaded] = useState(true);
 
-  const addLog = useCallback((msg: string) => {
+  const addLog = useCallback((msg: string, level: 'info' | 'warn' | 'error' = 'info') => {
     setScrapeLog(prev => [...prev, { time: new Date().toLocaleTimeString(), msg }]);
+    insertLog(sessionIdRef.current, msg, level);
   }, []);
 
   const checkInputs = useCallback(() => {
@@ -64,8 +68,10 @@ export function useScraper(
   const addLeads = useCallback((parsed: any[]) => {
     if (!Array.isArray(parsed) || parsed.length === 0) return;
     setScrapeResults(prev => [...prev, ...parsed]);
+    sessionLeadsCountRef.current += parsed.length;
     addLog(`✅ ¡Éxito! Se añadieron ${parsed.length} leads.`);
-  }, [addLog]);
+    insertLeads(sessionIdRef.current, parsed, aiProvider);
+  }, [addLog, aiProvider]);
 
   const searchLocation = async (q: string) => {
     if (!q.trim() || geocoding) return;
@@ -93,7 +99,10 @@ export function useScraper(
     if (!query.trim() || scraping) return;
 
     setScraping(true);
+    const startTime = Date.now();
+    sessionLeadsCountRef.current = 0;
     addLog(`🤖 ${aiProvider.toUpperCase()} - ${mode.toUpperCase()} - Iniciando: ${query.slice(0, 50)}...`);
+    sessionIdRef.current = await createSession({ niche, city, zone, region, aiProvider, scrapeMode: mode, query });
 
     let instructions = "Eres un agente OSINT profesional de generación de leads B2B. Tu ÚNICA fuente de información es la búsqueda web en tiempo real. PROHIBIDO inventar negocios, teléfonos, emails o direcciones. Si no encuentras un negocio mediante búsqueda real, no lo incluyas. Cada lead DEBE provenir de una fuente web verificable. Incluye siempre la URL fuente en el campo notes.";
     let prompt = `USA TU HERRAMIENTA DE BÚSQUEDA WEB AHORA para buscar: "${query}"\n\nBusca también variaciones: "${query} contacto teléfono", "${query} email whatsapp", "${query} dirección"\n\nPara cada negocio REAL encontrado en los resultados de búsqueda, extrae:\n- name: nombre exacto del negocio\n- phone: teléfono exacto como aparece\n- email: email exacto\n- whatsapp: enlace wa.me o número\n- website: URL exacta\n- instagram: @handle\n- address: dirección completa\n- lat: latitud (estima si conoces la ciudad)\n- lng: longitud (estima si conoces la ciudad)\n- notes: URL fuente + descripción breve\n\nSOLO negocios VERIFICADOS via búsqueda web real. NO inventes datos. Devuelve SOLO un array JSON.`;
@@ -266,11 +275,14 @@ export function useScraper(
         addLeads(fcGeocoded);
       }
     } catch (err: any) {
-      addLog(`❌ Error: ${err.message}`);
+      addLog(`❌ Error: ${err.message}`, 'error');
+      insertError(aiProvider, query, err.message);
     } finally {
+      await closeSession(sessionIdRef.current, sessionLeadsCountRef.current, Date.now() - startTime);
+      sessionIdRef.current = null;
       setScraping(false);
     }
-  }, [aiProvider, scraping, orModel, checkInputs, addLog, addLeads, city, R]);
+  }, [aiProvider, scraping, orModel, checkInputs, addLog, addLeads, city, region, niche, zone, R]);
 
   // Auto-start scrape when provider is ready and query is valid
   const autoStart = useCallback((query: string) => {
