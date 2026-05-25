@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
+    "@supabase/supabase-js": "^2.106.2",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "cobe": "^2.0.1",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "pg": "^8.21.0",
     "tailwindcss": "^4.1.14",
     "typescript": "~5.8.2"
   }
