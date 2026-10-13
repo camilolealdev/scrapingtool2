@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   'https://ngefsbjlplcpetpysgti.supabase.co',
-  'REMOVED-ROTATE-THIS-KEY'
+  SERVICE_ROLE_KEY
 );
 
 // Step 1: create bootstrap function that can execute DDL
