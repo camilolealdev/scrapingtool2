@@ -4,7 +4,7 @@ export const REGIONS: Record<string, Region> = {
   // dirs ordered: most-popular portal first → dirsTop3 always picks the best 3
   co: { name: "Colombia", flag: "🇨🇴", lang: "es", google: "google.com.co", tld: ".com.co", bing_loc: "co", ddg_region: "co-es",
     maps: "google.com.co/maps", ml: "mercadolibre.com.co", pa: "paginasamarillas.com.co",
-    dirs: ["kompass.com","cylex.com.co","infoisinfo.com.co","directorio-empresas.einforma.co","hotfrog.com.co","yalwa.com.co","tuugo.com.co","opendi.com.co","tupalo.com","informacolombia.com","negocios.ccb.org.co","blinder.com.co","tripadvisor.com"],
+    dirs: ["kompass.com","cylex.com.co","infoisinfo.com.co","directorio-empresas.einforma.co","hotfrog.com.co","yalwa.com.co","tupalo.com","informacolombia.com","blinder.com.co","tripadvisor.com"],
     apps: ["Rappi","Domicilios.com","iFood"], phone: "+57",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular|móvil|llamar", order: "pedidos|domicilios|envíos|delivery",
       open: "abrimos|inauguración|apertura|nuevo local", review: "reseña|reseñas|review|reviews", schedule: "horario|horarios",
@@ -12,7 +12,7 @@ export const REGIONS: Record<string, Region> = {
   },
   mx: { name: "México", flag: "🇲🇽", lang: "es", google: "google.com.mx", tld: ".com.mx", bing_loc: "mx", ddg_region: "mx-es",
     maps: "google.com.mx/maps", ml: "mercadolibre.com.mx", pa: "seccionamarilla.com.mx",
-    dirs: ["mx.kompass.com","cylex.com.mx","infoisinfo.com.mx","hotfrog.com.mx","yalwa.com.mx","tuugo.com.mx","opendi.com.mx","guiamexico.com.mx","indizze.mx","directorio.com.mx","citiservi.com.mx","tupalo.com","tripadvisor.com"],
+    dirs: ["mx.kompass.com","cylex.com.mx","infoisinfo.com.mx","hotfrog.com.mx","yalwa.com.mx","tuugo.com.mx","guiamexico.com.mx","indizze.mx","directorio.com.mx","citiservi.com.mx","tupalo.com","tripadvisor.com"],
     apps: ["Rappi","Didi Food","Uber Eats","Sin Delantal"], phone: "+52",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular", order: "pedidos|a domicilio|envíos|delivery",
       open: "abrimos|inauguración|apertura", review: "reseña|reseñas|review|opinión", schedule: "horario|horarios",
@@ -36,7 +36,7 @@ export const REGIONS: Record<string, Region> = {
   },
   pe: { name: "Perú", flag: "🇵🇪", lang: "es", google: "google.com.pe", tld: ".com.pe", bing_loc: "pe", ddg_region: "pe-es",
     maps: "google.com.pe/maps", ml: "mercadolibre.com.pe", pa: "paginasamarillas.com.pe",
-    dirs: ["kompass.com","cylex.com.pe","infoisinfo.com.pe","dir.pe","hotfrog.com.pe","yalwa.com.pe","tuugo.com.pe","opendi.com.pe","pyme.pe","negociovirtualperu.com","cclnegocios.pe","tupalo.com","tripadvisor.com"],
+    dirs: ["kompass.com","cylex.com.pe","infoisinfo.com.pe","dir.pe","hotfrog.com.pe","yalwa.com.pe","pyme.pe","negociovirtualperu.com","cclnegocios.pe","tupalo.com","tripadvisor.com"],
     apps: ["Rappi","PedidosYa","Yango Eats"], phone: "+51",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular", order: "pedidos|delivery|envíos",
       open: "abrimos|inauguración|apertura", review: "reseña|review|opinión", schedule: "horario|horarios",
@@ -44,7 +44,7 @@ export const REGIONS: Record<string, Region> = {
   },
   ec: { name: "Ecuador", flag: "🇪🇨", lang: "es", google: "google.com.ec", tld: ".com.ec", bing_loc: "ec", ddg_region: "ec-es",
     maps: "google.com.ec/maps", ml: "mercadolibre.com.ec", pa: "paginasamarillas.com.ec",
-    dirs: ["ec.kompass.com","cylex.com.ec","infoisinfo.com.ec","hotfrog.com.ec","yalwa.com.ec","tuugo.com.ec","opendi.com.ec","eqnegocios.com","web593.com","directorioempresasecuador.com","guiadenegocios.ec","tupalo.com","tripadvisor.com"],
+    dirs: ["ec.kompass.com","yalwa.com.ec","eqnegocios.com","web593.com","directorioempresasecuador.com","tupalo.com","tripadvisor.com"],
     apps: ["Rappi","PedidosYa","Picap"], phone: "+593",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular", order: "pedidos|delivery|envíos",
       open: "abrimos|inauguración|apertura", review: "reseña|review", schedule: "horario|horarios",
@@ -52,7 +52,7 @@ export const REGIONS: Record<string, Region> = {
   },
   br: { name: "Brasil", flag: "🇧🇷", lang: "pt", google: "google.com.br", tld: ".com.br", bing_loc: "br", ddg_region: "br-pt",
     maps: "google.com.br/maps", ml: "mercadolivre.com.br", pa: null,
-    dirs: ["br.kompass.com","telelistas.net","guiamais.com.br","cylex.com.br","hotfrog.com.br","infoisinfo.com.br","yelp.com.br","reclameaqui.com.br","listato.com.br","opendi.com.br","tuugo.com.br","yalwa.com.br","tupalo.com","tripadvisor.com"],
+    dirs: ["br.kompass.com","telelistas.net","guiamais.com.br","cylex.com.br","hotfrog.com.br","infoisinfo.com.br","yelp.com.br","reclameaqui.com.br","listato.com.br","opendi.com.br","yalwa.com.br","tupalo.com","tripadvisor.com"],
     apps: ["iFood","Rappi","Loggi"], phone: "+55",
     kw: { contact: "contato|fale conosco", phone: "telefone|celular|whatsapp", order: "pedidos|delivery|entregas",
       open: "inauguração|abertura|novo", review: "avaliação|avaliações|review", schedule: "horário|horários",
@@ -68,7 +68,7 @@ export const REGIONS: Record<string, Region> = {
   },
   es: { name: "España", flag: "🇪🇸", lang: "es", google: "google.es", tld: ".es", bing_loc: "es", ddg_region: "es-es",
     maps: "google.es/maps", ml: null, pa: "paginasamarillas.es",
-    dirs: ["es.kompass.com","einforma.com","qdq.com","cylex.es","infoisinfo.es","axesor.es","yelp.es","hotfrog.es","indizze.es","europages.es","yalwa.es","11870.com","vulka.es","tupalo.com","tripadvisor.com"],
+    dirs: ["es.kompass.com","einforma.com","qdq.com","cylex.es","infoisinfo.es","axesor.es","yelp.es","hotfrog.es","europages.es","yalwa.es","11870.com","vulka.es","tupalo.com","tripadvisor.com"],
     apps: ["Glovo","Just Eat","Uber Eats"], phone: "+34",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|móvil", order: "pedidos|reparto|delivery",
       open: "abrimos|inauguración|apertura", review: "reseña|reseñas|valoración", schedule: "horario|horarios",
@@ -76,7 +76,7 @@ export const REGIONS: Record<string, Region> = {
   },
   do: { name: "Rep. Dominicana", flag: "🇩🇴", lang: "es", google: "google.com.do", tld: ".com.do", bing_loc: "do", ddg_region: "do-es",
     maps: "google.com.do/maps", ml: null, pa: "paginasamarillas.com.do",
-    dirs: ["do.kompass.com","cylex.com.do","infoisinfo.com.do","hotfrog.com.do","directoriodominicano.net","bizpages.org","baseempresarial.com","prodominicana.gob.do","tupalo.com","tripadvisor.com"],
+    dirs: ["do.kompass.com","directoriodominicano.net","baseempresarial.com","prodominicana.gob.do","tupalo.com","tripadvisor.com"],
     apps: ["Uber Eats","PedidosYa","HeyJude"], phone: "+1-809",
     kw: { contact: "contacto|contáctenos", phone: "teléfono|celular|móvil", order: "pedidos|delivery|envíos",
       open: "abrimos|inauguración|apertura", review: "reseña|reseñas|review", schedule: "horario|horarios",
@@ -596,10 +596,8 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       templates: [
         { name: "Empresas en LinkedIn", query: `site:linkedin.com/company/ "{NICHE}" "{CITY}"`, desc: "Páginas de empresa LI", proTip: "linkedin.com/company/ = empresa formal con empleados" },
         { name: "Decisores (Google)", query: `site:linkedin.com/in/ ("CEO" OR "gerente" OR "director" OR "founder") "{NICHE}" "{CITY}"`, desc: "Perfiles de líderes de negocio", proTip: "Busca CEO, gerente, director para B2B directo" },
-        { name: "Boolean CEO+ciudad", query: `("CEO" OR "Gerente General" OR "Founder") AND "{NICHE}" AND "{CITY}"`, desc: "Boolean LI para decisores", proTip: "AND OR NOT en mayúscula para LinkedIn. Sin * wildcard." },
         { name: "Empresas buscando (Jobs)", query: `site:linkedin.com/jobs/ "{NICHE}" "{CITY}"`, desc: "Empresas contratando (crecimiento)", proTip: "Empresa que contrata = empresa con presupuesto" },
         { name: "Freelancers LI", query: `site:linkedin.com/in/ ("freelance" OR "independiente" OR "autónomo" OR "consultor") "{NICHE}" "{CITY}"`, desc: "Profesionales independientes", proTip: "Freelancers buscan herramientas y servicios constantemente" },
-        { name: "Sales Nav Boolean", query: `("Gerente" OR "Director" OR "VP" OR "Head of") AND "{NICHE}" NOT ("junior" OR "trainee" OR "pasante")`, desc: "String Boolean para Sales Navigator", proTip: "Copiar directo en Sales Nav > buscar personas > campo keywords" },
       ]
     },
 
@@ -626,10 +624,9 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       templates: [
         { name: "TikTok Negocios", query: `site:tiktok.com "@" "{NICHE}" "{CITY}" -inurl:/video/`, desc: "Cuentas TikTok de negocio", proTip: "TikTok = negocio digital activo. -inurl:/video/ filtra solo perfiles" },
         { name: "YouTube Canales", query: `site:youtube.com/channel/ OR site:youtube.com/c/ "{NICHE}" "{CITY}"`, desc: "Canales de negocio en YouTube", proTip: "Canal YouTube = negocio con presupuesto de marketing" },
-        { name: "Twitter negocios", query: `site:twitter.com "{NICHE}" "{CITY}" -inurl:/status/`, desc: "Cuentas Twitter de negocio", proTip: "-inurl:/status/ filtra solo perfiles, no tweets" },
+        { name: "Twitter negocios", query: `site:x.com "{NICHE}" "{CITY}" -inurl:/status/`, desc: "Cuentas Twitter de negocio", proTip: "-inurl:/status/ filtra solo perfiles, no tweets" },
         { name: "Pinterest catálogos", query: `site:pinterest.com "{NICHE}" "{CITY}"`, desc: "Catálogos visuales en Pinterest", proTip: "Pinterest = negocio con productos visuales (moda, deco, comida)" },
         { name: "Reddit proveedores", query: `site:reddit.com "proveedor" OR "vendedor" OR "fabricante" "{NICHE}" "{CITY}"`, desc: "Ofertas de proveedores en Reddit", proTip: "subreddit:Colombia subreddit:latinamerica para LATAM" },
-        { name: "Twitter menciones recientes", query: `"{NICHE}" "{CITY}" since:${year}-01-01 lang:es -filter:retweets`, desc: "Menciones Twitter este año", proTip: "Encuentra negocios activos en Twitter en tiempo real" },
       ]
     },
 
@@ -642,7 +639,6 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         { name: "Sin HTTPS", query: `"{NICHE}" "{CITY}" inurl:http:// -inurl:https:// intext:"${k.contact.split("|")[0]}"`, desc: "Sin certificado SSL", proTip: "HTTP sin S = hosting viejo o sitio desactualizado" },
         { name: "WordPress antiguo", query: `"{NICHE}" "{CITY}" inurl:wp-content intext:"© 2019" OR intext:"© 2018"`, desc: "WordPress sin actualizar", proTip: "WP viejo = vulnerable + cliente para mantenimiento" },
         { name: "Joomla/Drupal viejo", query: `"{NICHE}" "{CITY}" inurl:index.php?option= OR inurl:node/ intext:"${k.contact.split("|")[0]}"`, desc: "Joomla/Drupal sin actualizar", proTip: "Joomla con URL ?option= = sitio muy viejo" },
-        { name: "Flash/multimedia viejo", query: `"{NICHE}" "{CITY}" intext:"This site requires Flash" OR intext:"Adobe Flash"`, desc: "Sitios que aún piden Flash", proTip: "Flash = tecnología muerta en 2020 = cliente urgente" },
         { name: "Sin móvil", query: `"{NICHE}" "{CITY}" intext:"best viewed in" OR intext:"Internet Explorer" -site:facebook.com`, desc: "No responsive/mobile", proTip: '"Best viewed in" = sin diseño móvil' },
       ]
     },
@@ -673,12 +669,18 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       name: "Marketplaces & Clasificados", icon: null, color: "#FF9100",
       desc: "OLX, Craigslist, Trovit, clasificados locales",
       templates: [
-        { name: "OLX negocios", query: `site:olx.com "{NICHE}" "{CITY}"`, desc: "Vendedores en OLX", proTip: "OLX LATAM tiene miles de PYMES con teléfono directo" },
+        // OLX, Trovit y Locanto: solo se usan con dominio .co (no verificados para otros países)
+        ...(r === "co" ? [
+          { name: "OLX negocios", query: `site:olx.com.co "{NICHE}" "{CITY}"`, desc: "Vendedores en OLX", proTip: "Solo Colombia: dominio olx.com.co" },
+          { name: "Trovit servicios", query: `site:trovit.com.co "{NICHE}" "{CITY}"`, desc: "Servicios en Trovit Colombia", proTip: "Trovit agrega clasificados de múltiples fuentes" },
+          { name: "Locanto servicios", query: `site:locanto.com.co "{NICHE}" "{CITY}"`, desc: "Locanto = clasificados con contacto", proTip: "Locanto muestra el número por defecto" },
+        ] : []),
         { name: "Clasificados locales", query: `"{NICHE}" "{CITY}" "clasificados" OR "anuncios" OR "avisos" -site:facebook.com`, desc: "Clasificados de nicho", proTip: "Clasificados locales = negocios pequeños con necesidades reales" },
-        { name: "Computrabajo (leads)", query: `site:co.computrabajo.com "{NICHE}" "{CITY}"`, desc: "Empresas contratando = creciendo", proTip: "Empresa que publica empleo tiene presupuesto y decisores" },
+        // Computrabajo existe con subdominio por país en LATAM hispana
+        ...(["co","mx","ar","cl","pe","ec"].includes(r) ? [
+          { name: "Computrabajo (leads)", query: `site:${r}.computrabajo.com "{NICHE}" "{CITY}"`, desc: "Empresas contratando = creciendo", proTip: "Empresa que publica empleo tiene presupuesto y decisores" },
+        ] : []),
         { name: "Indeed empresas", query: `site:indeed.com "{NICHE}" "{CITY}"`, desc: "Empresas en Indeed", proTip: "Indeed muestra empresa + descripción + a veces email" },
-        { name: "Trovit inmuebles/servicios", query: `site:trovit.com.co "{NICHE}" "{CITY}"`, desc: "Servicios en Trovit LATAM", proTip: "Trovit agrega clasificados de múltiples fuentes" },
-        { name: "Locanto servicios", query: `site:locanto.com.co "{NICHE}" "{CITY}"`, desc: "Locanto = clasificados con contacto", proTip: "Locanto tiene número visible por defecto" },
       ]
     },
 
@@ -696,31 +698,12 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       ]
     },
 
-    // ── SHODAN / INFRAESTRUCTURA ──────────────────────────────────────────
-    shodan: {
-      name: "Shodan / OSINT Técnico", icon: null, color: "#A9312A",
-      desc: "Infraestructura web expuesta — panel admin, CMS, APIs",
-      templates: [
-        { name: "WordPress en LATAM", query: `http.title:"WordPress" country:${r.toUpperCase()} city:"{CITY}"`, desc: "Sitios WP en tu ciudad", proTip: "WP exposed = sitio real con dueño identificable" },
-        { name: "Panel admin expuesto", query: `http.title:"Dashboard" OR http.title:"Admin" country:${r.toUpperCase()} port:80`, desc: "Paneles de administración", proTip: "Dashboard expuesto = negocio con sistema web activo" },
-        { name: "Tiendas Shopify/WooCommerce", query: `http.html:"Powered by Shopify" OR http.html:"WooCommerce" country:${r.toUpperCase()}`, desc: "E-commerce activos", proTip: "Tiendas online = leads para marketing digital y SEO" },
-        { name: "cámaras IP negocios", query: `http.title:"Live View" OR http.title:"IP Camera" country:${r.toUpperCase()} city:"{CITY}"`, desc: "Cámaras IP de negocios", proTip: "Negocio con cámara IP = tiene local físico + contactable" },
-        { name: "Servidores web .co", query: `hostname:.com.co http.status:200 city:"{CITY}"`, desc: "Webs activas en Colombia", proTip: "hostname:.com.co + city filtra negocios locales reales" },
-        { name: "APIs REST expuestas", query: `http.html:"/api/v1" OR http.html:"swagger" country:${r.toUpperCase()}`, desc: "APIs de negocios tech", proTip: "API expuesta = empresa tech = potencial cliente SaaS" },
-      ]
-    },
 
     // ── YANDEX EXCLUSIVO ──────────────────────────────────────────────────
     yandex_ops: {
       name: "Yandex Power Operators", icon: null, color: "#FF0000",
       desc: "Operadores exclusivos de Yandex — indexa lo que Google ignora",
       templates: [
-        { name: "Dominio .country exacto", query: `"{NICHE}" "{CITY}" domain:${R.tld}`, desc: "Solo en dominio regional", proTip: "domain:.com.co en Yandex = sitios colombianos puro" },
-        { name: "Con link WA (body)", query: `"{NICHE}" "{CITY}" body:"wa.me" || body:"whatsapp"`, desc: "Yandex: body search WA", proTip: "body: en Yandex busca dentro del texto de la página" },
-        { name: "Título exacto negocio", query: `"{NICHE}" "{CITY}" title:"contacto" && title:"${k.phone.split("|")[0]}"`, desc: "Título con contacto y teléfono", proTip: "&& en Yandex = AND estricto entre palabras en misma oración" },
-        { name: "Host exacto + WA", query: `"{NICHE}" host:.${R.tld.replace(".", "")} body:"whatsapp" || body:"wa.me"`, desc: "Sitios del país con WA", proTip: "host: en Yandex es más preciso que site: de Google" },
-        { name: "Proximidad de términos", query: `"${k.contact.split("|")[0]}" /5 "${k.phone.split("|")[0]}" "{NICHE}" "{CITY}"`, desc: "Contacto y teléfono a 5 palabras", proTip: "/5 = dentro de 5 palabras de distancia" },
-        { name: "Documentos recientes", query: `"{NICHE}" "{CITY}" mime:pdf && date:${year}${String(new Date().getMonth()+1).padStart(2,"0")}..${year}12`, desc: "PDFs del año actual", proTip: "date:YYYYMM..YYYYMM filtra por mes en Yandex" },
       ]
     },
 
@@ -729,10 +712,10 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       name: "Brave Search Operators", icon: null, color: "#FB542B",
       desc: "Índice independiente de Brave — resultados que Google/Bing no muestran",
       templates: [
-        { name: "País + nicho (independiente)", query: `"{NICHE}" "{CITY}" country:${r} lang:${R.lang}`, desc: "Brave: filtro país y lengua", proTip: "Brave tiene índice propio. Encuentra páginas no en Google." },
-        { name: "Contactos recientes Brave", query: `"{NICHE}" "{CITY}" (${kws("contact")}) after:${year}-01-01 NOT site:instagram.com`, desc: "Páginas de contacto indexadas Brave", proTip: "after: filtra páginas nuevas no en Google aún" },
-        { name: "Filetype Brave", query: `"{NICHE}" "{CITY}" filetype:pdf "@" country:${r}`, desc: "PDFs por país en Brave", proTip: "Brave indexa PDFs que Google omite" },
-        { name: "Directorios Brave", query: `site:${R.dirs[0] || "cylex.com"} "{NICHE}" "{CITY}" country:${r}`, desc: "Directorio + filtro país Brave", proTip: "Combina site: y country: para precisión máxima" },
+        { name: "País + nicho (independiente)", query: `"{NICHE}" "{CITY}" loc:${r} lang:${R.lang}`, desc: "Brave: filtro país y lengua", proTip: "Brave tiene índice propio. Encuentra páginas no en Google." },
+        { name: "Contactos recientes Brave", query: `"{NICHE}" "{CITY}" (${kws("contact")}) NOT site:instagram.com`, desc: "Páginas de contacto indexadas Brave", proTip: "after: filtra páginas nuevas no en Google aún" },
+        { name: "Filetype Brave", query: `"{NICHE}" "{CITY}" filetype:pdf "@" loc:${r}`, desc: "PDFs por país en Brave", proTip: "Brave indexa PDFs que Google omite" },
+        { name: "Directorios Brave", query: `site:${R.dirs[0] || "cylex.com"} "{NICHE}" "{CITY}" loc:${r}`, desc: "Directorio + filtro país Brave", proTip: "Combina site: y country: para precisión máxima" },
       ]
     },
 
@@ -748,7 +731,7 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         { name: "AROUND proximity combo", query: `"{NICHE}" AROUND(5) "${k.contact.split("|")[0]}" site:.${R.tld}`, desc: "Nicho a 5 palabras de contacto", proTip: "AROUND(n) = ambas palabras dentro de n palabras" },
         { name: "Nuevos en 90 días", query: `"{NICHE}" "{CITY}" after:${new Date(Date.now()-90*24*60*60*1000).toISOString().split("T")[0]} (${kws("open")})`, desc: "Abiertos en últimos 90 días", proTip: "Últimos 90 días = negocios que acaban de abrir" },
         { name: "Triple motor combo", query: `"{NICHE}" "{CITY}" (${kws("contact")}) filetype:pdf OR filetype:xlsx OR filetype:csv`, desc: "Datos en archivos descargables", proTip: "Combinación filetype = bases de datos de contacto directas" },
-        { name: "Bing loc + inbody", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} inbody:"${k.phone.split("|")[0]}"`, desc: "Bing: país + teléfono en body", proTip: "inbody: en Bing es más fiable que intext: de Google" },
+        { name: "Bing loc + teléfono", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} "${k.phone.split("|")[0]}"`, desc: "Bing: país + teléfono en body", proTip: "loc: filtra por país en Bing; la frase exacta reemplaza a inbody:, poco fiable" },
       ]
     },
 
@@ -759,12 +742,11 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       templates: [
         { name: "TripAdvisor (portal #1)", query: `site:tripadvisor.com "{NICHE}" "{CITY}"`, desc: "Portal de reviews más grande del mundo", proTip: "TripAdvisor tiene teléfono, web y email directo de cada negocio" },
         ...(R.pa ? [{ name: "Páginas Amarillas + contacto", query: `site:${R.pa} "{NICHE}" "{CITY}" (${kws("phone")})`, desc: "Directorio oficial con filtro de teléfono", proTip: "PA es el directorio más confiable — datos estructurados y verificados" }] : []),
-        { name: "Top 5 portales combo", query: `"{NICHE}" "{CITY}" (${dirsTop5})`, desc: "5 portales más populares en un solo dork", proTip: "Máxima cobertura — usa en Google con num=100 para 100 resultados" },
+        { name: "Top 5 portales combo", query: `"{NICHE}" "{CITY}" (${dirsTop5})`, desc: "5 portales más populares en un solo dork", proTip: "Máxima cobertura — Google devuelve 10 por página, pagina para más" },
         { name: "Top 3 + email/WA", query: `"{NICHE}" "{CITY}" (${dirsTop3}) ("@" OR "wa.me" OR ${kws("phone")})`, desc: "Portales top con contacto directo visible", proTip: "Filtra solo negocios que exponen contacto en el directorio" },
         { name: "Portales + archivo", query: `"{NICHE}" "{CITY}" (${dirsTop4}) (filetype:pdf OR filetype:xlsx)`, desc: "Documentos descargables en directorios top", proTip: "PDFs de directorios suelen tener bases de datos completas" },
         { name: "Todos los portales (ALL)", query: `"{NICHE}" "{CITY}" (${dirsAll})`, desc: "Todos los portales del país en un dork", proTip: "Máxima cobertura — puede devolver muchos resultados" },
         { name: "Bing local + portales", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} (${dirsTop3})`, desc: "Portales filtrados por país en Bing", proTip: "Combina loc: de Bing con site: de directorios para precisión máxima" },
-        { name: "Google Maps + portales", query: `"{NICHE}" "{CITY}" (site:google.com/maps OR ${dirsTop2})`, desc: "Maps + portales top para mayor alcance", proTip: "Google Maps dorks revelan negocios sin web propia" },
       ]
     },
 
@@ -773,12 +755,10 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       name: "Bulk & Automatización", icon: null, color: "#607D8B",
       desc: "Dorks para generación masiva de leads",
       templates: [
-        { name: "Todas las redes", query: `"{NICHE}" "{CITY}" (site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:twitter.com) -inurl:/p/ -inurl:/posts/`, desc: "Todas las redes en un dork", proTip: "Un solo dork para cubrir todas las redes" },
+        { name: "Todas las redes", query: `"{NICHE}" "{CITY}" (site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:x.com) -inurl:/p/ -inurl:/posts/`, desc: "Todas las redes en un dork", proTip: "Un solo dork para cubrir todas las redes" },
         { name: "Todos los portales (país)", query: `"{NICHE}" "{CITY}" (${dirsAll})`, desc: "Todos los portales y directorios del país", proTip: "Combina todos los portales en un solo dork — máxima cobertura" },
         { name: "Todos los archivos", query: `"{NICHE}" "{CITY}" (filetype:pdf OR filetype:xlsx OR filetype:csv OR filetype:docx) "@"`, desc: "Todos los tipos de archivo con email", proTip: "Cubre todos los formatos de archivo con emails" },
         { name: "Multi-motor Bing loc", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} (${kws("contact")}) (${kws("phone")})`, desc: "Bing con filtro local", proTip: "Bing loc: es más agresivo que Google para datos locales" },
-        { name: "DDG Bang múltiple", query: `!yelp "{NICHE}" "{CITY}"`, desc: "DuckDuckGo bang a Yelp", proTip: "Usa DDG bangs para redirigir a múltiples directorios" },
-        { name: "GitHub leads tech", query: `site:github.com "contact" OR "email" "{NICHE}" "{CITY}" extension:md`, desc: "Contactos en README de GitHub", proTip: "extension:md = README files con emails de desarrolladores" },
       ]
     },
   };
@@ -799,7 +779,7 @@ export function fillTemplate(q: string, niche: string, city: string, zone: strin
 export function getBulkDorks(TEMPLATES: Record<string, CategoryTemplate>, niche: string, city: string, zone: string, region: string, showErrors: boolean): any[] {
   const year = new Date().getFullYear();
   const all: any[] = [];
-  if (!niche.trim() || !city.trim() || !zone.trim()) return [];
+  if (!niche.trim() || !city.trim()) return [];
   for (const cat of Object.values(TEMPLATES)) {
     for (const t of cat.templates) {
       const query = fillTemplate(t.query, niche, city, zone, year, showErrors);
@@ -810,18 +790,18 @@ export function getBulkDorks(TEMPLATES: Record<string, CategoryTemplate>, niche:
 }
 
 // Build search URL for any registered engine
-// Google max is 100 results/page; Bing max is 50; DDG doesn't support count param
+// Google ignora num=100 desde sept-2025 (10 por página); Bing max 50; DDG no admite count
 export function buildSearchUrl(engineId: string, query: string, regionKey?: string): string {
   const engine = SEARCH_ENGINES[engineId];
   const q = encodeURIComponent(query);
-  if (!engine) return `https://www.google.com/search?num=100&q=${q}`;
+  if (!engine) return `https://www.google.com/search?q=${q}`;
 
   // Special: google uses region-specific domain + max results
   if (engineId === "google" && regionKey) {
     const R = REGIONS[regionKey];
-    if (R) return `https://www.${R.google}/search?num=100&q=${q}`;
+    if (R) return `https://www.${R.google}/search?q=${q}`;
   }
-  if (engineId === "google") return `https://www.google.com/search?num=100&q=${q}`;
+  if (engineId === "google") return `https://www.google.com/search?q=${q}`;
 
   // Special: bing uses region cc param + max count
   if (engineId === "bing" && regionKey) {
