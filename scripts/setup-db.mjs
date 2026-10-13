@@ -20,8 +20,8 @@ if (fnErr) {
 const test = await fetch('https://ngefsbjlplcpetpysgti.supabase.co/rest/v1/rpc/version', {
   method: 'POST',
   headers: {
-    'apikey': 'REMOVED-ROTATE-THIS-KEY',
-    'Authorization': 'Bearer REMOVED-ROTATE-THIS-KEY',
+    'apikey': SERVICE_ROLE_KEY,
+    'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
     'Content-Type': 'application/json'
   },
   body: '{}'
