@@ -213,6 +213,27 @@ class Lead:
 
 # ═══ DORK BUILDER ═════════════════════════════════════════════════════
 
+# Directorios por país (verificados el 2026-10-13: se excluyen los que ya no resuelven)
+# y MercadoLibre por país. Colombia primero.
+DIRS: Dict[str, List[str]] = {
+    "co": ["cylex.com.co", "infoisinfo.com.co", "hotfrog.com.co", "paginasamarillas.com.co", "yalwa.com.co"],
+    "mx": ["cylex.com.mx", "infoisinfo.com.mx", "hotfrog.com.mx", "seccionamarilla.com.mx", "yalwa.com.mx"],
+    "ar": ["cylex.com.ar", "hotfrog.com.ar", "paginasamarillas.com.ar", "yalwa.com.ar"],
+    "cl": ["cylex.cl", "infoisinfo.cl", "hotfrog.cl", "paginasamarillas.cl", "yalwa.cl"],
+    "pe": ["cylex.com.pe", "infoisinfo.com.pe", "hotfrog.com.pe", "paginasamarillas.com.pe", "yalwa.com.pe"],
+    "ec": ["yalwa.com.ec", "paginasamarillas.com.ec"],
+    "es": ["cylex.es", "infoisinfo.es", "hotfrog.es", "paginasamarillas.es", "yalwa.es"],
+    "us": ["yelp.com", "yellowpages.com", "bbb.org", "manta.com"],
+    "br": ["cylex.com.br", "hotfrog.com.br", "guiamais.com.br", "opendi.com.br"],
+}
+DIAL_CODES: Dict[str, str] = {"co": "+57", "mx": "+52", "ar": "+54", "cl": "+56", "pe": "+51", "ec": "+593", "es": "+34", "us": "+1", "br": "+55"}
+MERCADOLIBRE: Dict[str, str] = {
+    "co": "mercadolibre.com.co", "mx": "mercadolibre.com.mx", "ar": "mercadolibre.com.ar",
+    "cl": "mercadolibre.cl", "pe": "mercadolibre.com.pe", "ec": "mercadolibre.com.ec",
+    "br": "mercadolivre.com.br",
+}
+
+
 def build_dorks(niche: str, city: str, region_id: str, zone: str = "") -> List[str]:
     R = REGIONS[region_id]
     y = str(datetime.now().year)
@@ -220,9 +241,7 @@ def build_dorks(niche: str, city: str, region_id: str, zone: str = "") -> List[s
     tld = R["tld"]
 
     dorks = [
-        # ── GMB / Local ──────────────────────────────────────────────
-        f'site:{R["google"]}/maps/place/ "{niche}" "{city}"',
-        f'"{niche}" "{city}" site:{R["google"]}/maps',
+        # (Se quitaron los dorks site:/maps: las fichas de Maps no exponen contacto al rastreo)
         # ── Instagram ────────────────────────────────────────────────
         f'site:instagram.com "{niche}" "{city}" -inurl:/p/ -inurl:/reel/ -inurl:/tv/',
         f'site:instagram.com "{niche}" "{city}" "wa.me" OR "whatsapp"',
@@ -251,8 +270,8 @@ def build_dorks(niche: str, city: str, region_id: str, zone: str = "") -> List[s
         f'site:linkedin.com/company/ "{niche}" "{city}"',
         f'site:tiktok.com "{niche}" "{city}" -inurl:/video/',
         # ── Directorios ──────────────────────────────────────────────
-        f'"{niche}" "{city}" site:cylex.com{tld}',
-        f'"{niche}" "{city}" site:infoisinfo.com{tld}',
+        *[f'"{niche}" "{city}" site:{d}' for d in DIRS.get(region_id, [])[:3]],
+        f'"{niche}" "{city}" ({" OR ".join("site:" + d for d in DIRS.get(region_id, [])[:4])}) ("@" OR "wa.me" OR "teléfono")' if DIRS.get(region_id) else "",
         # ── Negocios nuevos ──────────────────────────────────────────
         f'"{niche}" "{city}" ("inauguración" OR "grand opening" OR "nuevo") after:{y}-01-01',
         f'"{niche}" "{city}" "abrimos" OR "apertura" after:{y}-01-01',
@@ -261,14 +280,13 @@ def build_dorks(niche: str, city: str, region_id: str, zone: str = "") -> List[s
         f'"{niche}" "{city}" ("freelance" OR "independiente" OR "autónomo") ("whatsapp" OR "@gmail")',
         f'"{niche}" "{city}" "{z}" ("teléfono" OR "celular" OR "whatsapp")',
         # ── Marketplace ──────────────────────────────────────────────
-        f'site:olx.com "{niche}" "{city}"',
-        f'site:mercadolibre.com "{niche}" "{city}"',
-        # ── Bing-specific (enviados a Bing) ──────────────────────────
-        f'"{niche}" "{city}" loc:{region_id} inbody:"teléfono" OR inbody:"whatsapp"',
-        # ── Yandex-specific ──────────────────────────────────────────
-        f'"{niche}" "{city}" domain:{tld} body:"whatsapp" || body:"wa.me"',
+        *([f'site:olx.com.co "{niche}" "{city}"'] if region_id == "co" else []),
+        *([f'site:{MERCADOLIBRE[region_id]} "{niche}" "{city}"'] if region_id in MERCADOLIBRE else []),
+        # Sin operadores propios de Bing/Yandex: se envían a todos los motores en cascada
+        # y Google los tomaría como texto literal.
+        f'"{niche}" "{city}" "{DIAL_CODES[region_id]}" ("whatsapp" OR "wa.me")' if region_id in DIAL_CODES else "",
     ]
-    return dorks
+    return [d for d in dorks if d]
 
 
 # ═══ RETRY WITH BACKOFF ═══════════════════════════════════════════════
