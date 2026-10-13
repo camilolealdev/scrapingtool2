@@ -537,14 +537,14 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
       name: "Google My Business", icon: null, color: "#4285F4",
       desc: "Negocios en Google Maps sin presencia web",
       templates: [
-        { name: "Portales top 2", query: `"{NICHE}" "{CITY}" ${dirsTop2}`, desc: "Los 2 portales más populares del país", proTip: "Siempre son TripAdvisor + el directorio #1 local" },
+        { name: "Portales top 2", query: `"{NICHE}" "{CITY}" ${dirsTop2}`, desc: "Los 2 portales más populares del país", proTip: "Son los dos portales más usados del país según la lista de cada región" },
         { name: "Portales top 3", query: `"{NICHE}" "{CITY}" ${dirsTop3}`, desc: "3 portales de mayor tráfico", proTip: "Combina 3 portales para cobertura amplia" },
         { name: "Portales top 4", query: `"{NICHE}" "{CITY}" ${dirsTop4}`, desc: "4 portales con datos estructurados", proTip: "Añade un cuarto portal para leads adicionales" },
         { name: "Portales top 5", query: `"{NICHE}" "{CITY}" ${dirsTop5}`, desc: "Los 5 portales líderes por país", proTip: "Máxima cobertura con 5 portales en un solo dork" },
         { name: "Contacto expuesto", query: `"{NICHE}" "{CITY}" (${kws("contact")} OR ${kws("phone")}) -site:instagram.com -site:facebook.com`, desc: "Páginas con datos de contacto visibles", proTip: "Excluye redes para solo páginas web propias" },
-        { name: "Negocios nuevos", query: `"{NICHE}" "{CITY}" (${kws("open")}) after:${year-1}-01-01`, desc: "Aperturas recientes de este año", proTip: "Usa after: para encontrar negocios que abrieron recientemente" },
-        { name: "Sin web propia", query: `"{NICHE}" "{CITY}" (site:instagram.com OR site:facebook.com OR site:wa.me) -site:.${R.tld}`, desc: "Solo en redes, sin web", proTip: "Alta conversión: necesitan presencia web" },
-        { name: "Cotización activa", query: `"{NICHE}" "{CITY}" (${kws("quote")}) site:.${R.tld}`, desc: "Ofrecen cotización o presupuesto", proTip: "Indica negocio activo buscando clientes" },
+        { name: "Negocios nuevos", query: `"{NICHE}" "{CITY}" (${kws("open")}) after:${year-1}-01-01`, desc: "Aperturas desde el año pasado", proTip: "Usa after: para encontrar negocios que abrieron recientemente" },
+        { name: "Sin web propia", query: `"{NICHE}" "{CITY}" (site:instagram.com OR site:facebook.com OR site:wa.me) -site:${R.tld}`, desc: "Solo en redes, sin web", proTip: "Alta conversión: necesitan presencia web" },
+        { name: "Cotización activa", query: `"{NICHE}" "{CITY}" (${kws("quote")}) site:${R.tld}`, desc: "Ofrecen cotización o presupuesto", proTip: "Indica negocio activo buscando clientes" },
       ]
     },
 
@@ -728,7 +728,7 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         { name: "Freelancers activos", query: `"{NICHE}" "{CITY}" (${kws("independent")}) -site:linkedin.com -site:computrabajo.com`, desc: "Profesionales independientes", proTip: "Freelancers activos buscan servicios constantemente" },
         { name: "Bajo SEO + contacto", query: `"{NICHE}" "{CITY}" -site:instagram.com -site:facebook.com intitle:"${k.contact.split("|")[0]}"`, desc: "Web propia + contacto en título", proTip: "intitle:contacto = página dedicada de contacto" },
         { name: "Teléfono en URL", query: `"{NICHE}" "{CITY}" inurl:tel: OR inurl:phone OR inurl:telefono`, desc: "Teléfono en la URL", proTip: "tel: en URL = schema de teléfono clickeable" },
-        { name: "AROUND proximity combo", query: `"{NICHE}" AROUND(5) "${k.contact.split("|")[0]}" site:.${R.tld}`, desc: "Nicho a 5 palabras de contacto", proTip: "AROUND(n) = ambas palabras dentro de n palabras" },
+        { name: "AROUND proximity combo", query: `"{NICHE}" AROUND(5) "${k.contact.split("|")[0]}" site:${R.tld}`, desc: "Nicho a 5 palabras de contacto", proTip: "AROUND(n) = ambas palabras dentro de n palabras" },
         { name: "Nuevos en 90 días", query: `"{NICHE}" "{CITY}" after:${new Date(Date.now()-90*24*60*60*1000).toISOString().split("T")[0]} (${kws("open")})`, desc: "Abiertos en últimos 90 días", proTip: "Últimos 90 días = negocios que acaban de abrir" },
         { name: "Triple motor combo", query: `"{NICHE}" "{CITY}" (${kws("contact")}) filetype:pdf OR filetype:xlsx OR filetype:csv`, desc: "Datos en archivos descargables", proTip: "Combinación filetype = bases de datos de contacto directas" },
         { name: "Bing loc + teléfono", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} "${k.phone.split("|")[0]}"`, desc: "Bing: país + teléfono en body", proTip: "loc: filtra por país en Bing; la frase exacta reemplaza a inbody:, poco fiable" },
