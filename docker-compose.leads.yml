@@ -1,0 +1,32 @@
+# Stack aislado de Leads OSINT. NO toca el n8n de producción.
+# Uso: WORKER_KEY=... N8N_NETWORK=<red docker de tu n8n> docker compose -f docker-compose.leads.yml up -d --build
+# Búsqueda extra (SearXNG): añade --profile search
+services:
+  lead-worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    environment:
+      WORKER_KEY: ${WORKER_KEY:?define WORKER_KEY}
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpus: 1.0
+    pids_limit: 200
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ["/tmp:size=64m"]
+    networks: [n8n_net]
+    # sin "ports": solo accesible desde la red de n8n como http://lead-worker:8000
+
+  searxng:
+    profiles: ["search"]
+    image: searxng/searxng:latest
+    mem_limit: 512m
+    cpus: 0.5
+    restart: unless-stopped
+    networks: [n8n_net]
+
+networks:
+  n8n_net:
+    external: true
+    name: ${N8N_NETWORK:?define N8N_NETWORK (docker network ls)}

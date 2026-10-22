@@ -38,6 +38,7 @@ import random
 import argparse
 import sys
 import hashlib
+import os
 from urllib.parse import quote_plus, urlparse, urlencode
 from datetime import datetime
 from typing import Optional, List, Dict, Set
@@ -51,12 +52,15 @@ BS4_AVAILABLE = False
 try:
     from scrapling.fetchers import Fetcher, StealthyFetcher
     SCRAPLING_AVAILABLE = True
-    print("✅ Scrapling v2 detected — StealthyFetcher + adaptive selectors active")
+    print("✅ Scrapling detected — StealthyFetcher + adaptive selectors active")
 except ImportError:
     pass
 
 try:
-    from duckduckgo_search import DDGS
+    try:
+        from ddgs import DDGS  # paquete actual (duckduckgo_search fue renombrado)
+    except ImportError:
+        from duckduckgo_search import DDGS
     DDGS_AVAILABLE = True
     print("✅ duckduckgo-search detected — reliable DDG engine active")
 except ImportError:
@@ -116,9 +120,37 @@ def get_headers() -> Dict[str, str]:
         "Sec-Fetch-Site": "none",
     }
 
+def _first(el, sel):
+    """Scrapling 0.5 no tiene css_first: devuelve el primer match de css() o None."""
+    r = el.css(sel)
+    return r[0] if r else None
+
+
+_BUILDER_SIGS = None
+
+
+def detect_builder(html: str, headers=None, url: str = "") -> str:
+    """Constructor web detectado ('wix', 'shopify'...) o ''. Firmas compartidas con src/utils/builderSignatures.json."""
+    global _BUILDER_SIGS
+    if _BUILDER_SIGS is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src", "utils", "builderSignatures.json")
+        try:
+            with open(path, encoding="utf-8") as f:
+                _BUILDER_SIGS = json.load(f)
+        except Exception:
+            _BUILDER_SIGS = []
+    hdr = "\n".join(f"{k}: {v}" for k, v in (headers or {}).items())
+    hay = (url + "\n" + hdr + "\n" + (html or "")[:300000]).lower()
+    for key in ("strong", "weak"):
+        for sig in _BUILDER_SIGS:
+            if any(x in hay for x in sig[key]):
+                return sig["id"] if key == "strong" else sig["id"] + "?"
+    return ""
+
+
 # ═══ EXTRACTION PATTERNS ══════════════════════════════════════════════
 
-EMAIL_RE  = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
+EMAIL_RE  = re.compile(r"(?<![a-zA-Z0-9._%+\-])[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
 PHONE_RE  = re.compile(r"(?<!\d)(\+?[\d\s.\-()]{7,20})(?!\d)")
 WA_RE     = re.compile(r"wa\.me/(\d+)|api\.whatsapp\.com/send\?phone=(\d+)|whatsapp://send\?phone=(\d+)")
 IG_RE     = re.compile(r"instagram\.com/([a-zA-Z0-9_.]{2,30})(?:/|\?|$)")
@@ -174,6 +206,7 @@ class Lead:
         self.source_query  = ""
         self.score       = 0   # data completeness 0-100
         self.notes       = ""
+        self.builder     = ""
 
     def to_dict(self) -> Dict:
         return {k: v for k, v in vars(self).items()}
@@ -216,13 +249,13 @@ class Lead:
 # Directorios por país (verificados el 2026-10-13: se excluyen los que ya no resuelven)
 # y MercadoLibre por país. Colombia primero.
 DIRS: Dict[str, List[str]] = {
-    "co": ["cylex.com.co", "infoisinfo.com.co", "hotfrog.com.co", "paginasamarillas.com.co", "yalwa.com.co"],
-    "mx": ["cylex.com.mx", "infoisinfo.com.mx", "hotfrog.com.mx", "seccionamarilla.com.mx", "yalwa.com.mx"],
-    "ar": ["cylex.com.ar", "hotfrog.com.ar", "paginasamarillas.com.ar", "yalwa.com.ar"],
-    "cl": ["cylex.cl", "infoisinfo.cl", "hotfrog.cl", "paginasamarillas.cl", "yalwa.cl"],
-    "pe": ["cylex.com.pe", "infoisinfo.com.pe", "hotfrog.com.pe", "paginasamarillas.com.pe", "yalwa.com.pe"],
-    "ec": ["yalwa.com.ec", "paginasamarillas.com.ec"],
-    "es": ["cylex.es", "infoisinfo.es", "hotfrog.es", "paginasamarillas.es", "yalwa.es"],
+    "co": ["cylex.com.co", "infoisinfo.com.co", "hotfrog.com.co", "paginasamarillas.com.co"],
+    "mx": ["cylex.com.mx", "infoisinfo.com.mx", "hotfrog.com.mx", "seccionamarilla.com.mx"],
+    "ar": ["cylex.com.ar", "hotfrog.com.ar", "paginasamarillas.com.ar"],
+    "cl": ["cylex.cl", "infoisinfo.cl", "hotfrog.cl", "paginasamarillas.cl"],
+    "pe": ["cylex.com.pe", "infoisinfo.com.pe", "hotfrog.com.pe", "paginasamarillas.com.pe"],
+    "ec": ["paginasamarillas.com.ec"],
+    "es": ["cylex.es", "infoisinfo.es", "hotfrog.es", "paginasamarillas.es"],
     "us": ["yelp.com", "yellowpages.com", "bbb.org", "manta.com"],
     "br": ["cylex.com.br", "hotfrog.com.br", "guiamais.com.br", "opendi.com.br"],
 }
@@ -350,20 +383,20 @@ def _parse_google_results(page_content, use_scrapling=True) -> List[Dict]:
                 snippet = ""
 
                 for ls in GOOGLE_LINK_SELECTORS:
-                    link_el = item.css_first(ls)
+                    link_el = _first(item, ls)
                     if link_el:
                         href = extract_href(link_el, True)
                         if href:
                             break
 
                 for ts in GOOGLE_TITLE_SELECTORS:
-                    title_el = item.css_first(ts)
+                    title_el = _first(item, ts)
                     if title_el:
                         title = title_el.text.strip()
                         break
 
                 for ss in GOOGLE_SNIPPET_SELECTORS:
-                    snip_el = item.css_first(ss)
+                    snip_el = _first(item, ss)
                     if snip_el:
                         snippet = snip_el.text.strip()
                         break
@@ -461,12 +494,12 @@ def search_bing(query: str, region_id: str, num: int = 10, stealth: bool = False
                 for item in items:
                     link_el = None
                     for ls in BING_LINK_SELECTORS:
-                        link_el = item.css_first(ls)
+                        link_el = _first(item, ls)
                         if link_el:
                             break
                     snip_el = None
                     for ss in BING_SNIPPET_SELECTORS:
-                        snip_el = item.css_first(ss)
+                        snip_el = _first(item, ss)
                         if snip_el:
                             break
                     if link_el:
@@ -534,8 +567,8 @@ def search_ddg(query: str, region_id: str = "co", num: int = 10) -> List[Dict]:
             )
             results = []
             for r in page.css("div.result")[:num]:
-                link = r.css_first("a.result__a")
-                snippet = r.css_first("a.result__snippet")
+                link = _first(r, "a.result__a")
+                snippet = _first(r, "a.result__snippet")
                 if link:
                     href = link.attrib.get("href", "")
                     results.append({"url": href, "title": link.text, "snippet": snippet.text if snippet else ""})
@@ -589,9 +622,9 @@ def search_yandex(query: str, region_id: str = "co", num: int = 10) -> List[Dict
             for sel in YANDEX_RESULT_SELECTORS:
                 items = page.css(sel)
                 for item in items[:num]:
-                    link_el = item.css_first("a[href]")
-                    title_el = item.css_first("h2, .organic__title, .serp-item__title")
-                    snip_el = item.css_first(".organic__content-wrapper, .serp-item__text")
+                    link_el = _first(item, "a[href]")
+                    title_el = _first(item, "h2, .organic__title, .serp-item__title")
+                    snip_el = _first(item, ".organic__content-wrapper, .serp-item__text")
                     if link_el:
                         href = link_el.attrib.get("href", "")
                         if href.startswith("http") and "yandex.com" not in href:
@@ -638,9 +671,9 @@ def search_brave(query: str, region_id: str = "co", num: int = 10) -> List[Dict]
             for sel in BRAVE_RESULT_SELECTORS:
                 items = page.css(sel)
                 for item in items[:num]:
-                    link_el = item.css_first("a[href]")
-                    title_el = item.css_first("span.title, h3, .snippet-title")
-                    snip_el = item.css_first("p.snippet-description, .snippet-content")
+                    link_el = _first(item, "a[href]")
+                    title_el = _first(item, "span.title, h3, .snippet-title")
+                    snip_el = _first(item, "p.snippet-description, .snippet-content")
                     if link_el:
                         href = link_el.attrib.get("href", "")
                         if href.startswith("http") and "brave.com" not in href:
@@ -714,13 +747,17 @@ def extract_from_page(url: str, stealth: bool = False) -> Lead:
             else:
                 page = Fetcher.get(url, stealthy_headers=True, follow_redirects=True, timeout=12)
 
-            title_el = page.css_first("title")
+            title_el = _first(page, "title")
             if title_el:
                 lead.name = title_el.text.strip()[:120]
 
             # Use get_text() if available, else .text
             body_text = page.get_text() if hasattr(page, "get_text") else (page.text or "")
-            html_str  = str(page.html) if hasattr(page, "html") else body_text
+            html_str  = getattr(page, "html_content", None) or (str(page.html) if hasattr(page, "html") else body_text)
+            try:
+                lead.builder = detect_builder(html_str, dict(getattr(page, "headers", {}) or {}), url)
+            except Exception:
+                pass
 
             # ── Email via mailto: links (most reliable) ──
             mailto_emails = []
@@ -809,7 +846,7 @@ def extract_from_page(url: str, stealth: bool = False) -> Lead:
                     break
 
             # ── Address via schema ──
-            schema_el = page.css_first('[itemprop="address"], .address, [class*="address"]')
+            schema_el = _first(page, '[itemprop="address"], .address, [class*="address"]')
             if schema_el:
                 lead.address = schema_el.text.strip()[:200]
 
@@ -917,7 +954,7 @@ def run_spider_mode(niche: str, city: str, region_id: str, zone: str = "") -> Li
 
         async def parse(self, response: Response):
             for item in response.css("div.MjjYud, div.g, .Gx5Zad"):
-                link = item.css_first("a[href]")
+                link = _first(item, "a[href]")
                 if link:
                     href = link.attrib.get("href", "")
                     if href.startswith("/url?q="):
@@ -930,7 +967,7 @@ def run_spider_mode(niche: str, city: str, region_id: str, zone: str = "") -> Li
             lead.source_url = str(response.url)
             lead.source_engine = "Spider/Google"
 
-            title = response.css_first("title")
+            title = _first(response, "title")
             if title:
                 lead.name = title.text.strip()[:120]
 
@@ -1064,7 +1101,7 @@ def run(
     print("\n" + "═" * 64)
     if all_leads:
         fields = ["name","phone","email","whatsapp","website","instagram","facebook",
-                  "tiktok","youtube","address","score","source_engine","source_url","source_query","notes"]
+                  "tiktok","youtube","address","builder","score","source_engine","source_url","source_query","notes"]
         with open(output, "w", newline="", encoding="utf-8-sig") as f:
             writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
             writer.writeheader()
@@ -1100,7 +1137,7 @@ EXAMPLES:
   python dorking_scraper.py "electricista" "lima" -r pe --no-yandex -d 5
 
 INSTALL:
-  Full:    pip install "scrapling[fetchers]" duckduckgo-search && scrapling install
+  Full:    pip install "scrapling[fetchers]" ddgs && scrapling install
   Minimal: pip install requests beautifulsoup4
         """
     )

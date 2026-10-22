@@ -1,0 +1,22 @@
+[
+  {"id": "wix", "label": "Wix", "strong": ["static.wixstatic.com", "x-wix-request-id", "wixsite.com", "content=\"wix.com website builder"], "weak": ["wix.com"]},
+  {"id": "squarespace", "label": "Squarespace", "strong": ["static1.squarespace.com", "squarespace-cdn.com", "content=\"squarespace"], "weak": ["squarespace.com"]},
+  {"id": "shopify", "label": "Shopify", "strong": ["cdn.shopify.com", "shopify.theme", "x-shopify-stage", "x-shopid", "myshopify.com"], "weak": ["shopify"]},
+  {"id": "webflow", "label": "Webflow", "strong": ["data-wf-site", "assets.website-files.com", "cdn.prod.website-files.com", "content=\"webflow"], "weak": ["webflow.com"]},
+  {"id": "weebly", "label": "Weebly", "strong": ["editmysite.com", "weebly.com", "cdn2.editmysite.com"], "weak": []},
+  {"id": "jimdo", "label": "Jimdo", "strong": ["assets.jimcdn.com", "jimdofree", "jimdosite.com"], "weak": ["jimdo.com"]},
+  {"id": "godaddy", "label": "GoDaddy Website Builder", "strong": ["img1.wsimg.com", "godaddysites.com", "content=\"godaddy website builder"], "weak": ["secureserver"]},
+  {"id": "framer", "label": "Framer", "strong": ["framerusercontent.com", "content=\"framer", "framer.website"], "weak": []},
+  {"id": "tiendanube", "label": "Tiendanube / Nuvemshop", "strong": ["tiendanube.com", "nuvemshop.com", "d26lpennugtm8s.cloudfront.net", "mitiendanube.com"], "weak": []},
+  {"id": "hostinger", "label": "Hostinger / Zyro Builder", "strong": ["zyrosite.com", "hostingersite.com", "content=\"hostinger website builder"], "weak": []},
+  {"id": "googlesites", "label": "Google Sites", "strong": ["sites.google.com", "gstatic.com/sites"], "weak": []},
+  {"id": "strikingly", "label": "Strikingly", "strong": ["strikinglycdn.com", "mystrikingly.com"], "weak": []},
+  {"id": "duda", "label": "Duda", "strong": ["multiscreensite.com", "dmcdn.net", "irp.cdn-website.com", "lirp.cdn-website.com"], "weak": []},
+  {"id": "site123", "label": "SITE123", "strong": ["site123.me", "cdn-cms.f-static.net"], "weak": []},
+  {"id": "webnode", "label": "Webnode", "strong": ["webnode.page", "webnode.com", "d1di2lzuh97fh2.cloudfront.net"], "weak": []},
+  {"id": "carrd", "label": "Carrd", "strong": ["carrd.co"], "weak": []},
+  {"id": "blogger", "label": "Blogger", "strong": ["blogspot.com", "content=\"blogger\""], "weak": []},
+  {"id": "wordpresscom", "label": "WordPress.com", "strong": ["wordpress.com/", "wp.com/", "s0.wp.com", "s1.wp.com"], "weak": []},
+  {"id": "elementor", "label": "WordPress + Elementor", "strong": ["/wp-content/plugins/elementor", "elementor-widget", "data-elementor-type"], "weak": []},
+  {"id": "wordpress", "label": "WordPress", "strong": ["/wp-content/", "/wp-includes/", "content=\"wordpress"], "weak": ["wp-json"]}
+]

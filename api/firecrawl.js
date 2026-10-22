@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const { endpoint = 'search', ...body } = req.body || {};
     const authHeader = req.headers['authorization'] || '';
 
-    const response = await fetch(`https://api.firecrawl.dev/v1/${endpoint}`, {
+    const response = await fetch(`https://api.firecrawl.dev/v2/${endpoint}`, {
       method: 'POST',
       headers: {
         'Authorization': authHeader,
