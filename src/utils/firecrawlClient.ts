@@ -1,6 +1,6 @@
 import type { ScrapeResult } from '../types/index';
 
-const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const EMAIL_RE = /(?<![a-zA-Z0-9._%+-])[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const PHONE_RE = /(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}/g;
 const WA_RE = /wa\.me\/(\d+)/;
 const IG_RE = /instagram\.com\/([a-zA-Z0-9_.]{2,30})/;
@@ -31,10 +31,11 @@ export async function firecrawlSearch(
   }
 
   const data = await resp.json();
-  const results: any[] = data?.data ?? [];
+  // v2: data.web[]; v1 (compat): data[]
+  const results: any[] = data?.data?.web ?? (Array.isArray(data?.data) ? data.data : []);
 
   return results.map((r) => {
-    const text = `${r.title || ''} ${r.description || ''} ${r.markdown || ''}`;
+    const text = `${r.title || ''} ${r.description || ''} ${r.markdown || ''}`.slice(0, 200_000);
     const emails = Array.from(new Set(text.match(EMAIL_RE) ?? [])).slice(0, 2) as string[];
     const phones = Array.from(new Set(
       (text.match(PHONE_RE) ?? []).filter((p: string) => p.replace(/\D/g, '').length >= 7)

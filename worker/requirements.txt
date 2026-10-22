@@ -1,0 +1,6 @@
+fastapi==0.115.*
+uvicorn[standard]==0.32.*
+scrapling[fetchers]
+ddgs
+requests
+beautifulsoup4
