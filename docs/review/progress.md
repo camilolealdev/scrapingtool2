@@ -23,3 +23,8 @@ Final review: self-review (no hay revisor independiente); decide el dueño si ba
 - Nuevo: src/utils/builderSignatures.json + builderDetect.ts + detect_builder() (7/7 casos + cabeceras); worker/ (FastAPI, 401/422/429 probados), docker-compose.leads.yml (mem_limit 1g/512m, sin puertos), supabase/migrations/20261022_leads_dedupe.sql (NO aplicada: proyecto pausado, restore denegado).
 - Firecrawl: api/firecrawl.js -> /v2; firecrawlClient.ts lee data.web (compat v1).
 - n8n: carpeta Leads OSINT con Orquestador (iZBpF83ZxFmReaEH) y Manejador de errores (gbNSbyrkAbCIBv3g) + data table leads_osint_errores. Sin publicar.
+
+## 2026-10-22 (3) — Supabase y merge
+- Proyecto Supabase scrapingtool2 (mjsyudxqqtvnqzdqmpbo) reactivado; esquema aplicado (4 tablas, RLS on, 0 advisors). OJO: scripts/setup-db.mjs apunta a OTRO proyecto (ngefsbjlplcpetpysgti); no se usa.
+- Orquestador n8n alineado (run_id, source_provider, URL Supabase). errorWorkflow NO asignado: el manejador debe publicarse primero.
+- Prueba real de dorks: pendiente en el PC del usuario (scripts/dork_smoke.py); la VM no llega a buscadores.
