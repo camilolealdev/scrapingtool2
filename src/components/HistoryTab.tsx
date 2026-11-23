@@ -4,7 +4,7 @@ import { QueryResult } from '../types';
 
 interface HistoryTabProps {
   history: QueryResult[];
-  openSearch: (query: string, engine?: string) => void;
+  openSearch: (query: string, engine?: string, direct?: boolean) => void;
 }
 
 export function HistoryTab({ history, openSearch }: HistoryTabProps) {

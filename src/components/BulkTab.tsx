@@ -5,13 +5,12 @@ import { BulkDork } from '../types';
 interface BulkTabProps {
   bulkDorks: BulkDork[];
   copyToClipboard: (t: string) => void;
-  openSearch: (query: string, engine?: string) => void;
+  openSearch: (query: string, engine?: string, direct?: boolean) => void;
   R: any;
 }
 
 const BULK_ENGINES = [
   { id: "google",          label: "Google",     color: "text-blue-400" },
-  { id: "bing",            label: "Bing",        color: "text-cyan-400" },
   { id: "ddg",             label: "DDG",         color: "text-orange-400" },
   { id: "yandex",          label: "Yandex",      color: "text-red-400" },
   { id: "brave",           label: "Brave",       color: "text-orange-300" },

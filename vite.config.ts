@@ -14,11 +14,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: () => '/v1/messages',
       },
-      '/api/bing': {
-        target: 'https://api.bing.microsoft.com',
-        changeOrigin: true,
-        rewrite: (path) => '/v7.0/search' + path.replace(/^\/api\/bing/, ''),
-      },
       '/api/brave': {
         target: 'https://api.search.brave.com',
         changeOrigin: true,

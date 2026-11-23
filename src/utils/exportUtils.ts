@@ -174,22 +174,6 @@ def search_google(q, stealth=False, num=10):
         print(f"  ↻ Google err: {e}")
     return []
 
-def search_bing(q, num=10):
-    url = "https://www.bing.com/search"
-    params = {"q": q, "count": num, "cc": REGION, "setlang": "es"}
-    try:
-        if SCRAPLING:
-            full = url + "?" + "&".join(f"{k}={quote_plus(str(v))}" for k,v in params.items())
-            page = Fetcher.get(full, stealthy_headers=True)
-            return [li.css_first("h2 a").attrib.get("href","") for li in page.css("li.b_algo") if li.css_first("h2 a")]
-        elif BS4:
-            resp = requests.get(url, params=params, headers=hdr(), timeout=15)
-            soup = BeautifulSoup(resp.text, "html.parser")
-            return [li.select_one("h2 a").get("href","") for li in soup.select("li.b_algo") if li.select_one("h2 a")]
-    except Exception as e:
-        print(f"  ↻ Bing err: {e}")
-    return []
-
 def search_ddg(q, num=10):
     if DDGS_LIB:
         try:
@@ -208,7 +192,6 @@ def search_ddg(q, num=10):
 
 def multi_search(q, stealth=False, num=10):
     for name, fn in [("Google", lambda: search_google(q, stealth, num)),
-                     ("Bing",   lambda: search_bing(q, num)),
                      ("DDG",    lambda: search_ddg(q, num))]:
         results = fn()
         if results:

@@ -107,12 +107,6 @@ export const SEARCH_ENGINES: Record<string, SearchEngine> = {
     operators: ["site","intitle","inurl","intext","filetype","before","after","OR","AND","minus","exact","AROUND","allintitle","allinurl","related","cache","define"],
     notes: "Most powerful. Use dorks for lead extraction."
   },
-  bing: {
-    id: "bing", name: "Bing", icon: "B", color: "#00809D", category: "general",
-    baseUrl: "https://www.bing.com/search?q=", paramKey: "q",
-    operators: ["site","intitle","inurl","inbody","contains","loc","ip","near","meta","feed","hasfeed","language","prefer","filetype","b_after","b_before","exact","minus","OR","AND","NOT"],
-    notes: "Great for loc: country filter. inbody: finds text not in title."
-  },
   ddg: {
     id: "ddg", name: "DuckDuckGo", icon: "D", color: "#DE5833", category: "general",
     baseUrl: "https://duckduckgo.com/?q=", paramKey: "q",
@@ -320,7 +314,6 @@ export const DDG_BANGS: Record<string, { bang: string; name: string; desc: strin
   "!olx":        { bang: "!olx",        name: "OLX",          desc: "LATAM classifieds",                 category: "latam" },
   // Search engines
   "!g":          { bang: "!g",          name: "Google",       desc: "Direct to Google",                  category: "general" },
-  "!b":          { bang: "!b",          name: "Bing",         desc: "Direct to Bing",                    category: "general" },
   "!brave":      { bang: "!brave",      name: "Brave Search", desc: "Independent index",                 category: "general" },
   "!ya":         { bang: "!ya",         name: "Yandex",       desc: "Russian/CIS search",                category: "general" },
   // Docs
@@ -731,7 +724,6 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         { name: "AROUND proximity combo", query: `"{NICHE}" AROUND(5) "${k.contact.split("|")[0]}" site:${R.tld}`, desc: "Nicho a 5 palabras de contacto", proTip: "AROUND(n) = ambas palabras dentro de n palabras" },
         { name: "Nuevos en 90 días", query: `"{NICHE}" "{CITY}" after:${new Date(Date.now()-90*24*60*60*1000).toISOString().split("T")[0]} (${kws("open")})`, desc: "Abiertos en últimos 90 días", proTip: "Últimos 90 días = negocios que acaban de abrir" },
         { name: "Triple motor combo", query: `"{NICHE}" "{CITY}" (${kws("contact")}) filetype:pdf OR filetype:xlsx OR filetype:csv`, desc: "Datos en archivos descargables", proTip: "Combinación filetype = bases de datos de contacto directas" },
-        { name: "Bing loc + teléfono", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} "${k.phone.split("|")[0]}"`, desc: "Bing: país + teléfono en body", proTip: "loc: filtra por país en Bing; la frase exacta reemplaza a inbody:, poco fiable" },
       ]
     },
 
@@ -746,7 +738,6 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         { name: "Top 3 + email/WA", query: `"{NICHE}" "{CITY}" (${dirsTop3}) ("@" OR "wa.me" OR ${kws("phone")})`, desc: "Portales top con contacto directo visible", proTip: "Filtra solo negocios que exponen contacto en el directorio" },
         { name: "Portales + archivo", query: `"{NICHE}" "{CITY}" (${dirsTop4}) (filetype:pdf OR filetype:xlsx)`, desc: "Documentos descargables en directorios top", proTip: "PDFs de directorios suelen tener bases de datos completas" },
         { name: "Todos los portales (ALL)", query: `"{NICHE}" "{CITY}" (${dirsAll})`, desc: "Todos los portales del país en un dork", proTip: "Máxima cobertura — puede devolver muchos resultados" },
-        { name: "Bing local + portales", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} (${dirsTop3})`, desc: "Portales filtrados por país en Bing", proTip: "Combina loc: de Bing con site: de directorios para precisión máxima" },
       ]
     },
 
@@ -758,7 +749,6 @@ export function buildTemplates(r: string): Record<string, CategoryTemplate> {
         { name: "Todas las redes", query: `"{NICHE}" "{CITY}" (site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:x.com) -inurl:/p/ -inurl:/posts/`, desc: "Todas las redes en un dork", proTip: "Un solo dork para cubrir todas las redes" },
         { name: "Todos los portales (país)", query: `"{NICHE}" "{CITY}" (${dirsAll})`, desc: "Todos los portales y directorios del país", proTip: "Combina todos los portales en un solo dork — máxima cobertura" },
         { name: "Todos los archivos", query: `"{NICHE}" "{CITY}" (filetype:pdf OR filetype:xlsx OR filetype:csv OR filetype:docx) "@"`, desc: "Todos los tipos de archivo con email", proTip: "Cubre todos los formatos de archivo con emails" },
-        { name: "Multi-motor Bing loc", query: `"{NICHE}" "{CITY}" loc:${R.bing_loc} (${kws("contact")}) (${kws("phone")})`, desc: "Bing con filtro local", proTip: "Bing loc: es más agresivo que Google para datos locales" },
       ]
     },
   };
@@ -790,7 +780,7 @@ export function getBulkDorks(TEMPLATES: Record<string, CategoryTemplate>, niche:
 }
 
 // Build search URL for any registered engine
-// Google ignora num=100 desde sept-2025 (10 por página); Bing max 50; DDG no admite count
+// Google ignora num=100 desde sept-2025 (10 por página); DDG no admite count
 export function buildSearchUrl(engineId: string, query: string, regionKey?: string): string {
   const engine = SEARCH_ENGINES[engineId];
   const q = encodeURIComponent(query);
@@ -802,13 +792,6 @@ export function buildSearchUrl(engineId: string, query: string, regionKey?: stri
     if (R) return `https://www.${R.google}/search?q=${q}`;
   }
   if (engineId === "google") return `https://www.google.com/search?q=${q}`;
-
-  // Special: bing uses region cc param + max count
-  if (engineId === "bing" && regionKey) {
-    const R = REGIONS[regionKey];
-    if (R) return `https://www.bing.com/search?cc=${R.bing_loc}&count=50&q=${q}`;
-  }
-  if (engineId === "bing") return `https://www.bing.com/search?count=50&q=${q}`;
 
   // Special: DDG uses region param
   if (engineId === "ddg" && regionKey) {

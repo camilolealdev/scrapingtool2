@@ -16,7 +16,7 @@ interface TemplatesTabProps {
   renderHighlightedQuery: (q: string) => React.ReactNode;
   favorites: string[];
   toggleFavorite: (q: string) => void;
-  openSearch: (query: string, engine?: string) => void;
+  openSearch: (query: string, engine?: string, direct?: boolean) => void;
   setScrapeQuery: (v: string) => void;
   setTab: (v: string) => void;
 }

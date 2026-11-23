@@ -13,7 +13,7 @@ interface BuilderTabProps {
   favorites: string[];
   toggleFavorite: (q: string) => void;
   copyToClipboard: (t: string) => void;
-  openSearch: (query: string, engine?: string) => void;
+  openSearch: (query: string, engine?: string, direct?: boolean) => void;
   setScrapeQuery: (v: string) => void;
   setTab: (v: string) => void;
 }

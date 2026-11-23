@@ -10,7 +10,7 @@ import dorking_scraper as d
 niche = sys.argv[1] if len(sys.argv) > 1 else "dentista"
 city = sys.argv[2] if len(sys.argv) > 2 else "bogota"
 region = sys.argv[3] if len(sys.argv) > 3 else "co"
-engines = [("ddg", d.search_ddg), ("brave", d.search_brave), ("bing", lambda q, r, n: d.search_bing(q, r, n)), ("yandex", d.search_yandex)]
+engines = [("ddg", d.search_ddg), ("brave", d.search_brave), ("yandex", d.search_yandex)]
 
 dorks = d.build_dorks(niche, city, region)
 print(f"{len(dorks)} dorks para {niche}/{city}/{region}\n")

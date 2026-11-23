@@ -3,17 +3,17 @@
 Lectura obligatoria antes de tocar nada. Tiene 5 minutos. Si algo de aquí contradice lo que ves en el código, gana el código; actualiza este archivo.
 
 ## 1. Qué es y qué se quiere
-OSINT Lead Finder (React 19 + Vite + TS, Vercel, Supabase). Objetivo del dueño (Camilo): mejorarlo con **n8n**, actualizar la parte OSINT, que todos los métodos de búsqueda funcionen y **integrar al menos 3 herramientas OSS** (Firecrawl, herramientas de Google Maps, etc.) para obtener todo tipo de lead. Restricción dada: **hacerlo con los recursos más bajos posibles** (VPS pequeño que comparte máquina con los flujos de producción de Juancho's).
+OSINT Lead Finder (React 19 + Vite + TS, Vercel, Neon + n8n). Supabase queda como legado/respaldo temporal mientras se valida el cutover. Objetivo del dueño (Camilo): actualizar OSINT e integrar herramientas OSS de mapas y scraping con recursos mínimos.
 
 ## 2. Reglas de esta sesión de trabajo (no negociables)
 1. **Nunca imprimir valores de claves.** Citar solo archivo:línea y los 4 primeros caracteres.
 2. **No hacer commit ni push sin que Camilo lo pida.** Nota: el commit `66f1d58` (autor `camilolealdev`, 00:02 del 2026-10-13) incluye el plan y los informes 00, 02, 03, 05 y 06. `docs/review/01-security.md` y `progress.md` quedaron fuera: **no los subas a GitHub** (01 indica dónde están las claves expuestas). `.claude/`, `CLAUDE.md` y `LEER-PRIMERO.md` siguen sin versionar. Otra sesión editó este archivo y creó `03` y `06`: contrastar con el código.
 3. **No tocar los workflows de n8n de producción** (carpeta "Juancho's": agente WhatsApp, subflujos). Crear lo nuevo en otra carpeta.
-4. Flujo de trabajo acordado: `superpowers:brainstorming` → spec escrito → `writing-plans` → ejecución. **El diseño n8n NO está aprobado todavía** y no existe spec. No construir antes.
+4. Flujo acordado: spec escrito → plan → ejecución. El diseño de Leads OSINT fue aprobado el 2026-11-22 y ya existe spec/plan; n8n debe permanecer inactivo hasta completar los gates de producción.
 5. Idioma: español. Respuestas directas, sin elogios, con supuestos marcados, alternativas y riesgos (preferencias del dueño).
 
 ## 3. Lo más urgente (seguridad)
-- **CRÍTICO:** `scripts/setup-db.mjs` (líneas 5, 23, 24) tiene escrita la clave JWT de Supabase con `role: service_role`; está en el commit `f7becdc` y el remoto es `github.com/Coorops25/scrapingtool2`. Hay que rotarla y purgar el historial. **No sé si Camilo ya la rotó ni si el repo es público: preguntar primero.**
+- **CRÍTICO:** la clave JWT `service_role` de Supabase estuvo en el historial Git; el script operativo ya fue neutralizado, pero hay que revocarla y purgar el historial en GitHub.
 - **CRÍTICO, sin confirmar:** `dist/assets/index-*.js` (build local del 2026-05-25) tiene incrustadas 3 claves reales (Anthropic, Google/Gemini, Firecrawl). Falta ver si el sitio en vivo (scrapingtool2.vercel.app) y las variables `VITE_*` de Vercel las exponen. Si sí, rotar las tres.
 - `.env.local` está ignorado y no versionado: bien.
 
@@ -28,7 +28,7 @@ Plan: `docs/superpowers/plans/2026-10-12-project-review-plan.md` (9 tareas, cada
 | T1 Seguridad | hecha, falta `npm audit` y confirmar rotación | `01-security.md` |
 | T2 Arquitectura | hecha, falta `tsc --noEmit` (no hay `node_modules`) | `02-architecture.md` |
 | T3 Proveedores | hecha solo con documentación; falta prueba con claves | `03-providers.md` (ver aviso) |
-| T4 Datos / Supabase | pendiente (necesita el proyecto de Supabase) | — |
+| T4 Datos / Neon | esquema aplicado, rol `leads_app` creado; falta configurar secretos y prueba end-to-end | — |
 | T5 Extracción | hecha, falta probar en la interfaz | `05-extraction.md` |
 | T6 Legal | hecha; requiere revisión de abogado | `06-legal-risk.md` |
 | T7 UX | pendiente (hay que correr la app) | — |
@@ -43,12 +43,14 @@ Plan: `docs/superpowers/plans/2026-10-12-project-review-plan.md` (9 tareas, cada
 - `insertLeads` (`src/lib/db.ts`) hace `insert` sin clave única: repetir una búsqueda duplica filas.
 - `/api/*` son proxies con CORS `*` y sin límite; `api/firecrawl.js` deja elegir cualquier ruta con `endpoint`.
 
-## 6. Diseño propuesto (pendiente de aprobación de Camilo)
+## 6. Diseño aprobado para implementación (2026-11-22)
 Opción A con recursos mínimos: n8n como backend y la SPA como interfaz delgada.
 - Contenedores nuevos, cada uno con `mem_limit`: **SearXNG** (~300 MB estimados) y **`gosom/google-maps-scraper`** (hasta ~1 GB mientras trabaja, concurrencia 1). **Firecrawl por la nube**, solo para enriquecer los mejores leads (no self-hosted: es demasiado pesado). El resto del enriquecimiento con HTTP + regex en n8n.
-- Sin Postgres nuevo (usar Supabase), sin Redis. Lotes de 3 a 5, candado en Supabase para que no corran dos trabajos de Maps a la vez, trabajos pesados fuera de horario.
+- Neon como Postgres principal, sin Redis. Lotes de 3 a 5, candado en Neon/n8n para que no corran dos trabajos de Maps a la vez, trabajos pesados fuera de horario.
 - Las cifras de RAM son **estimaciones**; no se ha medido el VPS.
-- Fases: 1 seguridad → 2 SearXNG + orquestador → 3 Maps → 4 enriquecimiento → 5 limpieza de la SPA.
+- Fases: 1 seguridad (en curso) → 2 contrato/upsert → 3 Places + gosom → kit → dorking fallback → 5 n8n/SPA.
+- El kit queda aislado por su licencia AGPL-3.0; la versión se fija con `KIT_REF`.
+- El esquema Neon fue aplicado en `my-first-project` (`aws-sa-east-1`); la base está vacía y falta la prueba API→n8n→Neon.
 
 ## 7. Datos del entorno
 - n8n: instancia de Camilo con 9 credenciales (OpenAI, OpenRouter, Gemini, Groq, Anthropic, Postgres, WhatsApp); **ninguna** de Firecrawl, SearXNG ni Maps.
@@ -57,11 +59,12 @@ Opción A con recursos mínimos: n8n como backend y la SPA como interfaz delgada
 - Skills útiles del vault para la fase n8n: `n8n-workflow-patterns`, `n8n-subworkflows`, `n8n-error-handling`, `n8n-self-hosting`, `Firecrawl Automation`, `google-maps-automation`.
 - Cuentas distintas: el proyecto apunta a `Coorops25/scrapingtool2`; el vault es de `camilolealdev`. Confirmar que ambas son del dueño.
 
-## 8. Qué preguntar primero a Camilo
-1. ¿Rotó la clave `service_role` de Supabase? ¿El repo `Coorops25/scrapingtool2` es público?
-2. ¿Las claves de Anthropic, Google/Gemini y Firecrawl están en las variables de Vercel o en el sitio en vivo?
+## 8. Qué queda por verificar externamente
+1. Confirmar rotación de la clave `service_role` y exposición del repo/sitio.
+2. Configurar `NEON_DATABASE_URL`/`LEADS_INGEST_KEY` y verificar la prueba API→n8n→Neon.
 3. Salida de `free -m`, `nproc`, `df -h /` y `docker stats --no-stream` del VPS.
-4. ¿Aprueba el diseño de la sección 6 para escribir el spec?
+4. Configurar credenciales y probar el workflow nuevo `Leads OSINT`; no publicarlo/activarlo todavía.
+5. Confirmar revisión legal y retención de datos.
 
 ## 9. Cómo retomar
-Leer este archivo, luego `docs/review/progress.md`; seguir por T4/T6/T8 según lo que Camilo aporte; cerrar con T9; recién entonces escribir el spec en `docs/superpowers/specs/` y pedir su aprobación.
+Leer este archivo, luego `docs/review/progress.md` y el spec aprobado en `docs/superpowers/specs/2026-11-22-google-maps-leads-fallback.md`. Configurar Neon, conectar n8n y ejecutar smoke tests; mantener Supabase sin borrar hasta validar rollback.

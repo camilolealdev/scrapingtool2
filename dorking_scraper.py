@@ -4,7 +4,7 @@
   DORKING LAB — Python Lead Scraper v3.0
   Powered by Scrapling (https://github.com/D4Vinci/Scrapling)
 
-  Engines: Google → Bing → DuckDuckGo (DDGS lib) → Yandex → Brave
+  Engines: Google → DuckDuckGo (DDGS lib) → Yandex → Brave
   ✓ Scrapling StealthyFetcher — bypasses Cloudflare, anti-bot
   ✓ Scrapling Fetcher — fast HTTP with TLS fingerprint impersonation
   ✓ duckduckgo-search library — reliable DDG without scraping
@@ -294,10 +294,10 @@ def build_dorks(niche: str, city: str, region_id: str, zone: str = "") -> List[s
         # ── Webs propias ─────────────────────────────────────────────
         f'"{niche}" "{city}" inurl:contacto site:{tld.lstrip(".")}',
         f'"{niche}" "{city}" -site:instagram.com -site:facebook.com "teléfono" OR "celular" OR "phone"',
-        # ── Websites obsoletas ────────────────────────────────────────
-        f'"{niche}" "{city}" intext:"© 2018" OR intext:"© 2017" OR intext:"© 2019"',
-        f'"{niche}" "{city}" (site:wixsite.com OR site:weebly.com OR site:blogspot.com)',
-        f'"{niche}" "{city}" inurl:http:// -inurl:https:// "contacto"',
+        # ── Alta intención comercial ─────────────────────────────────
+        f'"{niche}" "{city}" ("cotización" OR "presupuesto" OR "solicitar servicio") ("teléfono" OR "whatsapp" OR "@")',
+        f'"{niche}" "{city}" ("agenda" OR "reservar" OR "disponibilidad") ("whatsapp" OR "contacto")',
+        f'"{niche}" "{city}" intitle:(contacto OR servicios OR "solicita tu") -site:instagram.com -site:facebook.com',
         # ── Social ───────────────────────────────────────────────────
         f'site:facebook.com/pages/ "{niche}" "{city}" -inurl:/posts/',
         f'site:linkedin.com/company/ "{niche}" "{city}"',
@@ -703,12 +703,11 @@ def search_brave(query: str, region_id: str = "co", num: int = 10) -> List[Dict]
 
 def multi_engine_search(query: str, region_id: str, num: int = 10, stealth: bool = False, use_yandex: bool = True) -> tuple:
     """
-    Google → Bing → DDG → Yandex → Brave
+    Google → DDG → Yandex → Brave
     Returns (results, engine_name)
     """
     engines = [
         ("Google",   lambda: search_google(query, region_id, num, stealth)),
-        ("Bing",     lambda: search_bing(query, region_id, num, stealth)),
         ("DDG",      lambda: search_ddg(query, region_id, num)),
         ("Yandex",   lambda: search_yandex(query, region_id, num)) if use_yandex else None,
         ("Brave",    lambda: search_brave(query, region_id, num)),

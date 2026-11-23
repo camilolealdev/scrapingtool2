@@ -4,7 +4,7 @@ import { Copy, Search, Trash2, Star } from "lucide-react";
 interface FavoritesTabProps {
   favorites: string[];
   copyToClipboard: (t: string) => void;
-  openSearch: (query: string, engine?: string) => void;
+  openSearch: (query: string, engine?: string, direct?: boolean) => void;
   toggleFavorite: (q: string) => void;
 }
 

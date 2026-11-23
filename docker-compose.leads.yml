@@ -8,6 +8,9 @@ services:
       dockerfile: worker/Dockerfile
     environment:
       WORKER_KEY: ${WORKER_KEY:?define WORKER_KEY}
+      GOSOM_URL: ${GOSOM_URL:-http://gosom:8080}
+      MAPS_KIT_URL: ${MAPS_KIT_URL:-http://maps-kit:8080}
+      EXTERNAL_TIMEOUT: ${EXTERNAL_TIMEOUT:-20}
     mem_limit: 1g
     memswap_limit: 1g
     cpus: 1.0
@@ -26,7 +29,48 @@ services:
     restart: unless-stopped
     networks: [n8n_net]
 
+  gosom:
+    profiles: ["maps"]
+    image: ${GOSOM_IMAGE:?define GOSOM_IMAGE with a pinned gosom image tag}
+    command: ["-data-folder", "/data"]
+    mem_limit: 1536m
+    cpus: 1.0
+    pids_limit: 300
+    restart: "no"
+    read_only: true
+    tmpfs: ["/tmp:size=128m"]
+    volumes:
+      - gosom_data:/data
+      - gosom_cache:/opt
+    expose: ["8080"]
+    networks: [n8n_net]
+
+  maps-kit:
+    profiles: ["maps"]
+    build:
+      context: ./integrations/maps-kit
+      args:
+        KIT_REF: ${KIT_REF:?define KIT_REF with a pinned kit commit or tag}
+    environment:
+      SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
+      SCRAPER_NO_UPDATE_CHECK: "1"
+    mem_limit: 1536m
+    cpus: 1.0
+    pids_limit: 300
+    restart: "no"
+    read_only: true
+    tmpfs: ["/tmp:size=128m"]
+    volumes:
+      - maps_kit_data:/kit/.engine/data
+    expose: ["8080"]
+    networks: [n8n_net]
+
 networks:
   n8n_net:
     external: true
     name: ${N8N_NETWORK:?define N8N_NETWORK (docker network ls)}
+
+volumes:
+  gosom_data:
+  gosom_cache:
+  maps_kit_data:

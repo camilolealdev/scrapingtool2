@@ -63,7 +63,6 @@ export default function QueryBuilder({ builtQuery, favorites, toggleFavorite, co
               <Star className={`w-3.5 h-3.5 ${favorites.includes(builtQuery) ? "fill-current" : ""}`} />
             </button>
             <button className="btn border border-b0 bg-bg1 text-blue-400 hover:bg-bg2" onClick={() => openSearch(builtQuery)}>Google</button>
-            <button className="btn border border-b0 bg-bg1 text-cyan-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "bing")}>Bing</button>
             <button className="btn border border-b0 bg-bg1 text-orange-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "ddg")}>DDG</button>
             <button className="btn border border-b0 bg-bg1 text-red-400 hover:bg-bg2" onClick={() => openSearch(builtQuery, "yandex")}>Yandex</button>
             <button className="btn border border-b0 bg-bg1 text-orange-300 hover:bg-bg2" onClick={() => openSearch(builtQuery, "brave")}>Brave</button>

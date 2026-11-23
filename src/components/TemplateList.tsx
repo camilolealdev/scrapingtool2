@@ -92,7 +92,6 @@ export default function TemplateList({ TEMPLATES, activeCategory, setActiveCateg
                 <div className="tc-q mb-3 line-clamp-2">{renderHighlightedQuery(filled)}</div>
                 <div className="flex flex-wrap gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button className="btn bg-bg1 border border-b0 px-1.5 py-1 text-[9px] text-blue-400" onClick={() => openSearch(filled)}>Google</button>
-                  <button className="btn bg-bg1 border border-b0 px-1.5 py-1 text-[9px] text-cyan-400" onClick={() => openSearch(filled, "bing")}>Bing</button>
                   <button className="btn bg-bg1 border border-b0 px-1.5 py-1 text-[9px] text-orange-400" onClick={() => openSearch(filled, "ddg")}>DDG</button>
                   <button className="btn bg-bg1 border border-b0 px-1.5 py-1 text-[9px] text-red-400" onClick={() => openSearch(filled, "yandex")}>Yandex</button>
                   <button className="btn bg-bg1 border border-b0 px-1.5 py-1 text-[9px] text-orange-300" onClick={() => openSearch(filled, "brave")}>Brave</button>

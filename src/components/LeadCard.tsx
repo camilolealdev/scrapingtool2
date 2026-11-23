@@ -3,6 +3,7 @@ import { ExternalLink, MapPin } from "lucide-react";
 import { ScrapeResult } from '../types';
 
 interface LeadCardProps {
+  key?: React.Key;
   lead: ScrapeResult;
   onViewOnMap?: (lat: number, lng: number) => void;
 }

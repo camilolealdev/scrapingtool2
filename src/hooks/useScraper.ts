@@ -6,11 +6,11 @@ import { callOpenRouter } from '../utils/openRouter';
 import { callNVIDIANIM } from '../utils/nvidiaNIM';
 import { googleCustomSearch } from '../utils/googleCS';
 import { callAnthropicClaude } from '../utils/anthropicClaude';
-import { bingWebSearch } from '../utils/bingSearch';
 import { braveWebSearch } from '../utils/braveSearch';
 import { firecrawlSearch } from '../utils/firecrawlClient';
 import { getStoredKey, persistEnvKeys } from '../utils/envKeys';
 import { createSession, closeSession, insertLeads, insertLog, insertError } from '../lib/db';
+import { getLeadJob, startLeadJob } from '../lib/leadsApi';
 
 export function useScraper(
   niche: string, city: string, zone: string, year: number,
@@ -38,7 +38,7 @@ export function useScraper(
 
   useEffect(() => { persistEnvKeys(); }, []);
 
-  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave" | "firecrawl">(() => {
+  const [aiProvider, setAiProvider] = useState<"gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "brave" | "firecrawl">(() => {
     if (getKey("VITE_GEMINI_API_KEY")) return "gemini";
     if (getKey("VITE_ANTHROPIC_API_KEY")) return "claude";
     if (getKey("VITE_OPENROUTER_API_KEY")) return "openrouter";
@@ -142,7 +142,7 @@ export function useScraper(
       const apiKey = getKey("VITE_GEMINI_API_KEY");
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         config: {
           systemInstruction: instructions,
@@ -210,7 +210,7 @@ export function useScraper(
             const geminiKey = getKey("VITE_GEMINI_API_KEY");
             const ai = new GoogleGenAI({ apiKey: geminiKey });
             const response = await ai.models.generateContent({
-              model: "gemini-2.0-flash",
+              model: "gemini-2.5-flash",
               contents: [{ role: "user", parts: [{ text: `Analiza esta página: ${item.link}. Extrae leads de negocios. Devuelve array JSON.` }] }],
               config: {
                 systemInstruction: instructions,
@@ -249,14 +249,6 @@ export function useScraper(
           }
         }
         addLog(`✅ Procesadas ${results.length} URLs.`);
-      } else if (aiProvider === "bing") {
-        addLog("🔷 Consultando Bing Search API...");
-        const bingKey = getKey("VITE_BING_API_KEY");
-        if (!bingKey) throw new Error("Bing API key no configurada");
-        const mkt = R?.lang === "pt" ? "pt-BR" : `es-${(R?.bing_loc || "CO").toUpperCase()}`;
-        const bingResults = await bingWebSearch(bingKey, query, 10, mkt);
-        const bingGeocoded = await geocodeNewLeads(bingResults);
-        addLeads(bingGeocoded);
       } else if (aiProvider === "brave") {
         addLog("🦁 Consultando Brave Search API...");
         const braveKey = getKey("VITE_BRAVE_API_KEY");
@@ -284,6 +276,44 @@ export function useScraper(
     }
   }, [aiProvider, scraping, orModel, checkInputs, addLog, addLeads, city, region, niche, zone, R]);
 
+  const runLeadsApi = useCallback(async () => {
+    if (!niche.trim() || !city.trim() || scraping) {
+      if (!niche.trim() || !city.trim()) {
+        setShowErrors(true);
+        showToast('⚠ Falta: Nicho y Ciudad');
+      }
+      return;
+    }
+    setScraping(true);
+    sessionLeadsCountRef.current = 0;
+    const started = Date.now();
+    try {
+      addLog('🌐 API Leads — enviando trabajo asíncrono al backend...');
+      const job = await startLeadJob({ niche, city, zone, country: region, query: scrapeQuery, method: 'places', limit: 20 });
+      sessionIdRef.current = job.session_id;
+      addLog(`🆔 Job ${job.session_id.slice(0, 8)} en cola.`);
+      for (let attempt = 0; attempt < 40; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        const state = await getLeadJob(job.session_id, job.access_token);
+        const status = state.session?.status || 'running';
+        addLog(`⏳ Backend: ${status} (${state.leads.length} leads)`);
+        if (status === 'failed') throw new Error('El backend marcó el trabajo como fallido');
+        if (status === 'completed') {
+          addLeads(state.leads);
+          addLog(`✅ API Leads completada: ${state.leads.length} leads.`);
+          return;
+        }
+      }
+      throw new Error('Tiempo de espera agotado; el job continúa en el backend');
+    } catch (error: any) {
+      addLog(`❌ API Leads: ${error.message}`, 'error');
+      insertError('leads-api', scrapeQuery, error.message);
+    } finally {
+      sessionIdRef.current = null;
+      setScraping(false);
+    }
+  }, [scraping, addLog, niche, city, zone, region, scrapeQuery, addLeads, setShowErrors, showToast]);
+
   // Auto-start scrape when provider is ready and query is valid
   const autoStart = useCallback((query: string) => {
     if (!query.trim() || scraping) return;
@@ -293,7 +323,6 @@ export function useScraper(
       (aiProvider === "openrouter" && getKey("VITE_OPENROUTER_API_KEY")) ||
       (aiProvider === "nvidia" && getKey("VITE_NVIDIA_API_KEY")) ||
       (aiProvider === "google-cs" && getKey("VITE_GOOGLE_CS_API_KEY") && getKey("VITE_GOOGLE_CS_CX")) ||
-      (aiProvider === "bing" && getKey("VITE_BING_API_KEY")) ||
       (aiProvider === "brave" && getKey("VITE_BRAVE_API_KEY")) ||
       (aiProvider === "firecrawl" && getKey("VITE_FIRECRAWL_API_KEY"));
     if (hasKey) {
@@ -641,11 +670,7 @@ def run(niche: str, city: str, region_id: str, zone: str = "", max_pages: int = 
         results = search_google(query, region_id, max_pages, stealth)
         engine_used = "Google"
         if not results:
-            print("  ↳ Google blocked, trying Bing...")
-            results = search_bing(query, region_id, max_pages, stealth)
-            engine_used = "Bing"
-        if not results:
-            print("  ↳ Bing failed, trying DuckDuckGo...")
+            print("  ↳ Google blocked, trying DuckDuckGo...")
             results = search_ddg(query, max_pages)
             engine_used = "DuckDuckGo"
         print(f"  ↳ {engine_used}: {len(results)} results")
@@ -772,7 +797,7 @@ if __name__ == "__main__":
     geocoding, mapParams, setMapParams, locSearch, setLocSearch,
     aiProvider, setAiProvider, orModel, setOrModel,
     keysLoaded, setKeysLoaded, getKey,
-    checkInputs, addLog, searchLocation, runAIScrape, runBatchScrape, autoStart,
+    checkInputs, addLog, searchLocation, runAIScrape, runLeadsApi, runBatchScrape, autoStart,
     exportLeadsCSV, generatePythonScript, downloadPythonScript, exportScrapeLog, exportAllLogs,
     sortedAndFilteredLeads
   };

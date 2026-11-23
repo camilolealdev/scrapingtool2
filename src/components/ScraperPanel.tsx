@@ -22,9 +22,11 @@ interface Props {
   showToast: (m: string) => void;
   generatePythonScript: () => void;
   region: any;
+  setTab?: (v: string) => void;
+  setScrapeLog?: (v: any[] | ((prev: any[]) => any[])) => void;
 }
 
-export default function ScraperPanel({ scrapeQuery, setScrapeQuery, scrapeResults, scraping, scrapeLog, scraperMode, setScraperMode, batchInput, setBatchInput, runAIScrape, runBatchScrape, exportLeadsCSV, sortedAndFilteredLeads, leadsSearch, setLeadsSearch, sortConfig, setSortConfig, showToast, generatePythonScript }: Props) {
+export default function ScraperPanel({ scrapeQuery, setScrapeQuery, scrapeResults, setScrapeResults, scraping, scrapeLog, setScrapeLog, scraperMode, setScraperMode, batchInput, setBatchInput, runAIScrape, runBatchScrape, exportLeadsCSV, sortedAndFilteredLeads, leadsSearch, setLeadsSearch, sortConfig, setSortConfig, showToast, generatePythonScript, setTab }: Props) {
   return (
     <div>
       <div className="bg-bgc border border-b0 rounded-xl p-4 mb-4">
@@ -119,7 +121,7 @@ export default function ScraperPanel({ scrapeQuery, setScrapeQuery, scrapeResult
             <span className="text-[10px] font-bold text-t2 uppercase tracking-widest">{sortedAndFilteredLeads.length} Leads Encontrados</span>
             {scrapeResults.length > 0 && (
               <div className="flex gap-4">
-                <button className="flex items-center gap-1.5 text-cyan-brand text-[10px] font-bold hover:underline" onClick={() => setTab("map")}>
+                <button className="flex items-center gap-1.5 text-cyan-brand text-[10px] font-bold hover:underline" onClick={() => setTab?.("map")}>
                   <MapPin className="w-3 h-3" /> Ver en Mapa
                 </button>
                 <button className="flex items-center gap-1.5 text-blue-brand text-[10px] font-bold hover:underline" onClick={exportLeadsCSV}>
@@ -163,7 +165,7 @@ export default function ScraperPanel({ scrapeQuery, setScrapeQuery, scrapeResult
               <div key={i} className="bg-bgc border border-b0 rounded-lg p-3 hover:border-b1 transition-all">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-bold text-sm text-t0">{lead.name || "Sin nombre"}</h4>
-                  <button className="text-t2 hover:text-red-brand" onClick={() => setScrapeResults(prev => prev.filter((_, idx) => idx !== i))}>
+                  <button className="text-t2 hover:text-red-brand" onClick={() => setScrapeResults?.(prev => prev.filter((_, idx) => idx !== i))}>
                     ×
                   </button>
                 </div>
@@ -185,7 +187,7 @@ export default function ScraperPanel({ scrapeQuery, setScrapeQuery, scrapeResult
         <div className="bg-bg0 border border-b0 rounded-xl p-3 overflow-y-auto">
           <div className="text-[9px] font-bold text-t2 uppercase tracking-widest mb-2 flex justify-between">
             Log de Extracción
-            <button className="text-t2 hover:text-red-brand text-[9px]" onClick={() => setScrapeLog([])}>Limpiar</button>
+            <button className="text-t2 hover:text-red-brand text-[9px]" onClick={() => setScrapeLog?.([])}>Limpiar</button>
           </div>
           <div className="space-y-1">
             {scrapeLog.map((l, i) => (

@@ -1,0 +1,125 @@
+{
+  "version": 2,
+  "skills": {
+    "n8n-agents": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-agents/SKILL.md",
+      "computedHash": "843c238b0593dee1e8c6f687a9816e7032fa0d0823edfb2eea0ca6d8cd174e90",
+      "installMode": "copy"
+    },
+    "n8n-binary-and-data": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-binary-and-data/SKILL.md",
+      "computedHash": "31d44178bfc6f252f88c6523e865cdd80d6988a266f62a29ad3de2f77c3743c9",
+      "installMode": "copy"
+    },
+    "n8n-code-javascript": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-code-javascript/SKILL.md",
+      "computedHash": "a368c1f091318e4d4aeca5398cb88acdd1d3d47dc3223ff06476d93e39f5baff",
+      "installMode": "copy"
+    },
+    "n8n-code-python": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-code-python/SKILL.md",
+      "computedHash": "c0dafa764e623c1e9531c4ba1b69661abbfa8a55f680f98d3ff857a970a82f53",
+      "installMode": "copy"
+    },
+    "n8n-code-tool": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-code-tool/SKILL.md",
+      "computedHash": "9d85f959b74b9f6a64a3a17b967b88fd57268b21e254660489e66bcb51e31dda",
+      "installMode": "copy"
+    },
+    "n8n-error-handling": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-error-handling/SKILL.md",
+      "computedHash": "a2dfe226c5830359ec3611c0fec97522ac29b5d3fdedee65173c4ad653188808",
+      "installMode": "copy"
+    },
+    "n8n-expression-syntax": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-expression-syntax/SKILL.md",
+      "computedHash": "639ef38b7f5b1a07739f17c831c9148756ad73ca4b9b9643c15fbaa89e2d000c",
+      "installMode": "copy"
+    },
+    "n8n-mcp-tools-expert": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-mcp-tools-expert/SKILL.md",
+      "computedHash": "2ee8bd6bdd37d1ed0d5437c0ba55eeb1752672ef3c59ba8c56b44a9ca9bc3700",
+      "installMode": "copy"
+    },
+    "n8n-multi-instance": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-multi-instance/SKILL.md",
+      "computedHash": "3f44167b81cb2460a0e9ee43ad21bd46916b912b42842308ad48fc6eee16e4b1",
+      "installMode": "copy"
+    },
+    "n8n-node-configuration": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-node-configuration/SKILL.md",
+      "computedHash": "ea61ae4e06b49268669219a318f82b4fa383116dcc7a5885a85157661b243950",
+      "installMode": "copy"
+    },
+    "n8n-self-hosting": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-self-hosting/SKILL.md",
+      "computedHash": "b2164c98f075fc6a92d9aa95639f55e33fa7c3d98018ee570982db07bdabfdd4",
+      "installMode": "copy"
+    },
+    "n8n-subworkflows": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-subworkflows/SKILL.md",
+      "computedHash": "93cba5e0ba85b6164490c531f9569e060f60da8271aba0bc33319e8841ce6e5a",
+      "installMode": "copy"
+    },
+    "n8n-validation-expert": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-validation-expert/SKILL.md",
+      "computedHash": "b7ff9bab2a808329a20d7f57f7f2a75e95c920a53841ab05aeb59210cb99bc93",
+      "installMode": "copy"
+    },
+    "n8n-workflow-patterns": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/n8n-workflow-patterns/SKILL.md",
+      "computedHash": "0f664bd7c18407e687c76f5cda245fef015f23bd6ba0ec57d4d40563146092b8",
+      "installMode": "copy"
+    },
+    "using-n8n-mcp-skills": {
+      "source": "czlonkowski/n8n-skills",
+      "commit": "ecdeca6f760b56bb1b11c0a7c961f11b69cb87d5",
+      "sourceType": "github",
+      "skillPath": "skills/using-n8n-mcp-skills/SKILL.md",
+      "computedHash": "793fb389025f114852ce71937ff3117dcc44656de6562dfe05d645bffaba293c",
+      "installMode": "copy"
+    }
+  }
+}

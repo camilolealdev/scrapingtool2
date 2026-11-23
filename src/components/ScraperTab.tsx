@@ -3,6 +3,7 @@ import { getStoredKey } from '../utils/envKeys';
 import { Bot, Terminal, Instagram, Mail, Zap, MapPin, Download, Search, FileText, Database, Eye, EyeOff, Copy, Check } from "lucide-react";
 import { ScrapeResult, LogEntry } from '../types';
 import { LeadCard } from './LeadCard';
+import { ASSISTANT_SEARCHES, getReferralUrl, openAssistantSearch } from '../utils/assistantSearch';
 
 interface ScraperTabProps {
   scraping: boolean;
@@ -11,6 +12,7 @@ interface ScraperTabProps {
   scrapeQuery: string;
   setScrapeQuery: (v: string) => void;
   runAIScrape: (query: string, mode?: "standard" | "instagram" | "emails" | "phones") => void;
+  runLeadsApi: () => void;
   batchInput: string;
   setBatchInput: (v: string) => void;
   runBatchScrape: () => void;
@@ -30,8 +32,8 @@ interface ScraperTabProps {
   downloadPythonScript: () => void;
   autoStart: (query: string) => void;
   setMapParams: (v: { center: [number, number]; zoom: number }) => void;
-  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave" | "firecrawl";
-  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "bing" | "brave" | "firecrawl") => void;
+  aiProvider: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "brave" | "firecrawl";
+  setAiProvider: (v: "gemini" | "openrouter" | "nvidia" | "google-cs" | "claude" | "brave" | "firecrawl") => void;
   orModel: string;
   setOrModel: (v: string) => void;
 }
@@ -42,7 +44,6 @@ const KEY_MAP = {
   openrouter: 'VITE_OPENROUTER_API_KEY',
   nvidia: 'VITE_NVIDIA_API_KEY',
   'google-cs': 'VITE_GOOGLE_CS_API_KEY',
-  bing: 'VITE_BING_API_KEY',
   brave: 'VITE_BRAVE_API_KEY',
   firecrawl: 'VITE_FIRECRAWL_API_KEY',
 };
@@ -53,7 +54,6 @@ const PROVIDER_LABELS: Record<string, { label: string; badge: string; color: str
   openrouter: { label: 'OpenRouter', badge: '🔁 Multi', color: '#7C3AED', placeholder: 'sk-or-... (openrouter.ai)' },
   nvidia:     { label: 'NVIDIA',     badge: '⚡ NIM',   color: '#76B900', placeholder: 'nvapi-... (build.nvidia.com)' },
   'google-cs':{ label: 'Google CS',  badge: '🔎 CS',    color: '#EA4335', placeholder: 'API Key...' },
-  bing:       { label: 'Bing',       badge: '🔷 Search',color: '#0078D4', placeholder: 'Bing Search API key...' },
   brave:      { label: 'Brave',      badge: '🦁 Search',  color: '#FB542B', placeholder: 'BSA... (brave.com/search/api)' },
   firecrawl:  { label: 'Firecrawl', badge: '🔥 Scrape',  color: '#F97316', placeholder: 'fc-... (firecrawl.dev)' },
 };
@@ -62,7 +62,7 @@ const CX_KEY = 'VITE_GOOGLE_CS_CX';
 
 export function ScraperTab({
   scraping, scraperMode, setScraperMode, scrapeQuery, setScrapeQuery,
-  runAIScrape, batchInput, setBatchInput, runBatchScrape,
+  runAIScrape, runLeadsApi, batchInput, setBatchInput, runBatchScrape,
   scrapeResults, leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
   sortedAndFilteredLeads, setTab, exportLeadsCSV, scrapeLog,
   exportScrapeLog, allHistoryLogs, exportAllLogs,
@@ -153,6 +153,29 @@ export function ScraperTab({
               </button>
             </div>
           </div>
+        </div>
+
+        <div className="bg-bg1/50 p-3 rounded-lg border border-b0 mb-4">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="text-[10px] font-bold text-t2 uppercase tracking-widest">Búsqueda asistida</span>
+            <span className="text-[9px] text-t2">Usa la sesión del usuario; no comparte claves.</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {ASSISTANT_SEARCHES.map(({ id, label }) => (
+              <button key={id} className="btn bg-bg1 border border-b0 text-[10px] text-t1 hover:text-blue-brand"
+                onClick={() => openAssistantSearch(id, scrapeQuery)} disabled={!scrapeQuery.trim()}>
+                Abrir {label}
+              </button>
+            ))}
+            {ASSISTANT_SEARCHES.map(({ id, label }) => {
+              const referral = getReferralUrl(id);
+              return referral ? <a key={`ref-${id}`} href={referral} target="_blank" rel="noreferrer"
+                className="btn bg-yellow-500/10 border border-yellow-500/20 text-[10px] text-yellow-300">
+                {label}: referido opcional
+              </a> : null;
+            })}
+          </div>
+          <p className="text-[9px] text-t2 mt-2">Los referidos solo aparecen si se configuran y nunca crean cuentas automáticamente.</p>
         </div>
 
         {/* Provider selector */}
@@ -290,13 +313,13 @@ export function ScraperTab({
           {(aiProvider === 'gemini' || aiProvider === 'claude') && (
             <p className="text-[9px] text-green-brand mt-2 flex items-center gap-1">
               <span>✓</span>
-              {aiProvider === 'gemini' ? 'Gemini 2.0 Flash — búsqueda web en vivo vía Google Search' : 'Claude claude-sonnet-4-6 — búsqueda web en vivo vía Anthropic Web Search'}
+              {aiProvider === 'gemini' ? 'Gemini 2.5 Flash — búsqueda web en vivo vía Google Search' : 'Claude claude-sonnet-4-6 — búsqueda web en vivo vía Anthropic Web Search'}
             </p>
           )}
-          {(aiProvider === 'bing' || aiProvider === 'brave') && (
+          {aiProvider === 'brave' && (
             <p className="text-[9px] text-blue-400 mt-2 flex items-center gap-1">
               <span>✓</span>
-              {aiProvider === 'bing' ? 'Bing Web Search API — resultados reales de Bing, extrae contactos de snippets' : 'Brave Search API — índice independiente, encuentra páginas que Google/Bing no muestran'}
+              Brave Search API — índice independiente, encuentra páginas que otros índices no muestran
             </p>
           )}
           {aiProvider === 'firecrawl' && (
@@ -324,6 +347,9 @@ export function ScraperTab({
                   disabled={scraping || !hasValidKey()}
                 >
                   Extraer
+                </button>
+                <button className="btn bg-cyan-brand/20 border border-cyan-brand/30 text-cyan-brand px-3" onClick={runLeadsApi} disabled={scraping || !scrapeQuery.trim()} title="Usar API backend: Places + fallback worker">
+                  API Leads
                 </button>
                 <button className="btn bg-pink-brand/20 border border-pink-brand/30 text-pink-brand px-3" onClick={() => runAIScrape(scrapeQuery, "instagram")} title="Extraer de Instagram">
                   <Instagram className="w-4 h-4" />

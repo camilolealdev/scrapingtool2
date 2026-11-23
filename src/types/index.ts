@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export interface Region {
   name: string;
   flag: string;
@@ -33,7 +35,7 @@ export interface Template {
 
 export interface CategoryTemplate {
   name: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   desc: string;
   templates: Template[];
@@ -57,7 +59,32 @@ export interface ScrapeResult {
   address?: string;
   lat?: number;
   lng?: number;
+  place_id?: string;
+  rating?: number;
+  reviews_count?: number;
+  categories?: string[];
+  opening_hours?: string[];
+  google_maps_url?: string;
+  builder?: string;
+  intent_score?: number;
+  facebook?: string;
+  linkedin?: string;
+  tiktok?: string;
+  youtube?: string;
+  x?: string;
+  source_provider?: string;
+  source_url?: string;
+  captured_at?: string;
+  dedupe_key?: string;
+  opt_out?: boolean;
   notes?: string;
+}
+
+export interface LeadRecord extends ScrapeResult {
+  name: string;
+  source_provider: string;
+  captured_at: string;
+  dedupe_key: string;
 }
 
 export interface LogEntry {

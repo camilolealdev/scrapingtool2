@@ -43,7 +43,7 @@ export default function App() {
     leadsSearch, setLeadsSearch, sortConfig, setSortConfig,
     geocoding, mapParams, setMapParams,
     checkInputs, addLog, searchLocation: scraperSearchLoc,
-    runAIScrape, runBatchScrape, autoStart,
+    runAIScrape, runLeadsApi, runBatchScrape, autoStart,
     exportLeadsCSV: scraperExportCSV,
     generatePythonScript,
     downloadPythonScript,
@@ -76,7 +76,6 @@ export default function App() {
     // Engines that use q= or similar standard params
     const stdUrls: Record<string, string> = {
       google:            `https://www.${R.google}/search?q=`,
-      bing:              `https://www.bing.com/search?cc=${R.bing_loc}&q=`,
       ddg:               `https://duckduckgo.com/?kl=${R.ddg_region}&q=`,
       yandex:            `https://yandex.com/search/?text=`,
       brave:             `https://search.brave.com/search?q=`,
@@ -172,7 +171,7 @@ export default function App() {
   const bulkDorks = useMemo(() => {
     if (!niche.trim() || !city.trim() || !zone.trim()) return [];
     const all: BulkDork[] = [];
-    for (const cat of Object.values(TEMPLATES)) {
+    for (const cat of Object.values(TEMPLATES) as CategoryTemplate[]) {
       for (const t of cat.templates) {
         const q = fillTemplate(t.query, niche, city, zone, year, showErrors);
         all.push({ cat: cat.name, name: t.name, query: q });
@@ -260,6 +259,7 @@ export default function App() {
                   setScraperMode={setScraperMode} scrapeQuery={scrapeQuery}
                   setScrapeQuery={setScrapeQuery}
                   runAIScrape={runAIScrape} batchInput={batchInput}
+                  runLeadsApi={runLeadsApi}
                   setBatchInput={setBatchInput} runBatchScrape={runBatchScrape}
                   scrapeResults={scrapeResults} leadsSearch={leadsSearch}
                   setLeadsSearch={setLeadsSearch} sortConfig={sortConfig}
